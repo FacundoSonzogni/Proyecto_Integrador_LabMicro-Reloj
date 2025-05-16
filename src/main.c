@@ -41,6 +41,7 @@
 /* === Headers files inclusions =============================================================== */
 
 #include "chip.h"
+#include "digitals.h"
 #include <stdbool.h>
 
 /* === Macros definitions ====================================================================== */
@@ -122,7 +123,17 @@
 int main(void) {
 
     int divisor  = 0;
-    bool current_state, last_state = false;
+
+    digital_output_t led_blue = DigitalOutputCreate(LED_B_GPIO, LED_B_BIT);
+    digital_output_t led_1 = DigitalOutputCreate(LED_1_GPIO, LED_1_BIT);
+    digital_output_t led_2 = DigitalOutputCreate(LED_3_GPIO, LED_2_BIT);
+    digital_output_t led_3 = DigitalOutputCreate(LED_3_GPIO, LED_3_BIT);
+
+    digital_input_t tecla_1 = DigitalInputCreate(TEC_1_GPIO, TEC_1_BIT, true); 
+    digital_input_t tecla_2 = DigitalInputCreate(TEC_2_GPIO, TEC_2_BIT, true);
+    digital_input_t tecla_3 = DigitalInputCreate(TEC_3_GPIO, TEC_3_BIT, true);
+    digital_input_t tecla_4 = DigitalInputCreate(TEC_4_GPIO, TEC_4_BIT, true);
+
 
     Chip_SCU_PinMuxSet(LED_R_PORT, LED_R_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_R_FUNC);
     Chip_GPIO_SetPinState(LPC_GPIO_PORT, LED_R_GPIO, LED_R_BIT, false);
@@ -163,29 +174,32 @@ int main(void) {
     Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, TEC_4_GPIO, TEC_4_BIT, false);
 
     while (true) {
-        if (Chip_GPIO_ReadPortBit(LPC_GPIO_PORT, TEC_1_GPIO, TEC_1_BIT) == 0) {
-            Chip_GPIO_SetPinState(LPC_GPIO_PORT, LED_B_GPIO, LED_B_BIT, true);
+
+        // Lógica para el control del Led Azul
+        if (DigitalInputGetIsActive(tecla_1)) {
+            DigitalOutputActivate(led_blue);
         } else {
-            Chip_GPIO_SetPinState(LPC_GPIO_PORT, LED_B_GPIO, LED_B_BIT, false);
+            DigitalOutputDeactivate(led_blue);
         }
 
-        current_state = (Chip_GPIO_ReadPortBit(LPC_GPIO_PORT, TEC_2_GPIO, TEC_2_BIT) == 0);
-        if ((current_state) && (!last_state)) {
-            Chip_GPIO_SetPinToggle(LPC_GPIO_PORT, LED_1_GPIO, LED_1_BIT);
-        }
-        last_state = current_state;
-
-        if (Chip_GPIO_ReadPortBit(LPC_GPIO_PORT, TEC_3_GPIO, TEC_3_BIT) == 0) {
-            Chip_GPIO_SetPinState(LPC_GPIO_PORT, LED_2_GPIO, LED_2_BIT, true);
-        }
-        if (Chip_GPIO_ReadPortBit(LPC_GPIO_PORT, TEC_4_GPIO, TEC_4_BIT) == 0) {
-            Chip_GPIO_SetPinState(LPC_GPIO_PORT, LED_2_GPIO, LED_2_BIT, false);
+        // Lógica para el control del LED 1 (Rojo)
+        if(DigitalInputWasActivated(tecla_2)){
+            DigitalOutputToggle(led_1);
         }
 
+        //Lógica para el control del LED 2 (Amarillo)
+        if (DigitalInputGetIsActive(tecla_3)) {
+            DigitalOutputActivate(led_2);
+        }
+        if (DigitalInputGetIsActive(tecla_4)) {
+            DigitalOutputDeactivate(led_2);
+        }
+
+        // Lógica para el control del LED 3 (Verde)
         divisor++;
         if (divisor == 5) {
             divisor = 0;
-            Chip_GPIO_SetPinToggle(LPC_GPIO_PORT, LED_3_GPIO, LED_3_BIT);
+            DigitalOutputToggle(led_3);
         }
 
         for (int index = 0; index < 100; index++) {
