@@ -63,6 +63,9 @@ digital_output_t DigitalOutputCreate(uint8_t gpio_port, uint8_t gpio_bit) {
         self->gpio_bit = gpio_bit;
     }
 
+    Chip_GPIO_SetPinState(LPC_GPIO_PORT, gpio_port, gpio_bit, false);
+    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, gpio_port, gpio_bit, true);
+
     return self;
 }
 
@@ -88,13 +91,15 @@ digital_input_t DigitalInputCreate(uint8_t gpio_port, uint8_t gpio_bit, bool inv
         self->last_state = DigitalInputGetIsActive(self);
     }
 
+    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, gpio_port, gpio_bit, false);
+
     return self;
 }
 
 bool DigitalInputGetIsActive(digital_input_t self) {
     bool state = Chip_GPIO_ReadPortBit(LPC_GPIO_PORT, self->gpio_port, self->gpio_bit); // Devuelve TRUE si está en ALTO
 
-    if ((self->inverted_logic) = true) {
+    if ((self->inverted_logic) == true) {
         state = !state;
     }
 
