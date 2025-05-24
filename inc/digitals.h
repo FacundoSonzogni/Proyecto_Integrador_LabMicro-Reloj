@@ -24,8 +24,6 @@ SPDX-License-Identifier: MIT
 /** @file digitals.h
  ** @brief Cabecera del módulo de Gestión de Entradas y Salidas Digitales
  **
- ** @addtogroup Alumno Módulo de Gestión de Entradas y Salidas Digitales
- ** @{
  **/
 
 /* === Headers files inclusions ==================================================================================== */
@@ -138,13 +136,10 @@ bool DigitalInputWasActivated(digital_input_t input);
 bool DigitalInputWasDeactivated(digital_input_t input);
 
 
-
-
 /* === End of conditional blocks =================================================================================== */
 
 #ifdef __cplusplus
 }
 #endif
-//! @}
 
 #endif /* DIGITALS_H */

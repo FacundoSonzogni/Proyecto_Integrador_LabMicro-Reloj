@@ -26,7 +26,6 @@ SPDX-License-Identifier: MIT
 
 #include "digitals.h"
 #include "chip.h"
-#include <stdint.h>
 #include <stdlib.h>
 
 /* === Macros definitions ========================================================================================== */
@@ -61,10 +60,10 @@ digital_output_t DigitalOutputCreate(uint8_t gpio_port, uint8_t gpio_bit) {
     if (self != NULL) {
         self->gpio_port = gpio_port;
         self->gpio_bit = gpio_bit;
-    }
 
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, gpio_port, gpio_bit, false);
-    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, gpio_port, gpio_bit, true);
+        Chip_GPIO_SetPinState(LPC_GPIO_PORT, gpio_port, gpio_bit, false);
+        Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, gpio_port, gpio_bit, true);
+    }
 
     return self;
 }
@@ -89,9 +88,9 @@ digital_input_t DigitalInputCreate(uint8_t gpio_port, uint8_t gpio_bit, bool inv
         self->gpio_bit = gpio_bit;
         self->inverted_logic = inverted_logic;
         self->last_state = DigitalInputGetIsActive(self);
-    }
 
-    Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, gpio_port, gpio_bit, false);
+        Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, gpio_port, gpio_bit, false);
+    }
 
     return self;
 }
