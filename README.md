@@ -1,6 +1,6 @@
 # Proyecto Integrador (Reloj con Alarma) -  Electrónica IV
 
-En este repositorio, se construirá el Proyecto Integrador de la Asigantura "Laboratorio de Microprocesadores" (Electrónica IV), el cual consiste de los Trabajos Prácticos de Laboratorio N°4
+En este repositorio, se construirá el Proyecto Integrador de la Asigantura "Laboratorio de Microprocesadores" (Electrónica IV), el cual consiste de los Trabajos Prácticos de Laboratorio N°4, N°6
 
 **Alumno:** Facundo Sonzogni
 

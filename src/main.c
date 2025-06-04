@@ -40,7 +40,6 @@
 
 /* === Headers files inclusions =============================================================== */
 
-#include "chip.h"
 #include "digitals.h"
 #include "bsp.h"
 

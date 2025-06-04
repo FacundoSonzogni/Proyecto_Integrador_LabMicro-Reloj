@@ -54,6 +54,8 @@ struct digital_input_s {
 
 /* === Private function definitions ================================================================================ */
 
+/* === Public function definitions ================================================================================= */
+
 digital_output_t DigitalOutputCreate(uint8_t gpio_port, uint8_t gpio_bit) {
     digital_output_t self = malloc(sizeof(struct digital_output_s));
 
@@ -143,7 +145,5 @@ bool DigitalInputWasDeactivated(digital_input_t self) {
 
     return result;
 }
-
-/* === Public function definitions ================================================================================= */
 
 /* === End of documentation ======================================================================================== */
