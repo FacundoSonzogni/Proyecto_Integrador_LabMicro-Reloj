@@ -68,22 +68,22 @@ int main(void) {
     while (true) {
 
         // Lógica para el control del Led Azul
-        if (DigitalInputGetIsActive(board->key_push)) {
+        if (DigitalInputGetIsActive(board->key_F1)) {
             DigitalOutputActivate(board->led_blue);
         } else {
             DigitalOutputDeactivate(board->led_blue);
         }
 
         // Lógica para el control del LED 1 (Rojo)
-        if (DigitalInputWasActivated(board->key_toggle)) {
+        if (DigitalInputWasActivated(board->key_F2)) {
             DigitalOutputToggle(board->led_red);
         }
 
         // Lógica para el control del LED 2 (Amarillo)
-        if (DigitalInputGetIsActive(board->key_turn_on)) {
+        if (DigitalInputGetIsActive(board->key_F3)) {
             DigitalOutputActivate(board->led_yellow);
         }
-        if (DigitalInputGetIsActive(board->key_turn_off)) {
+        if (DigitalInputGetIsActive(board->key_F4)) {
             DigitalOutputDeactivate(board->led_yellow);
         }
 

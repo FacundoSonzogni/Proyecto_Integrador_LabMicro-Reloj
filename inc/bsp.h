@@ -41,10 +41,10 @@ extern "C" {
 
 //! Estructura de datos que representa a la placa de desarrollo
 typedef struct board_s {
-    digital_input_t key_push;     //!< Tecla que permite prender el led azul (mientras se mantenga pulsado)
-    digital_input_t key_toggle;   //!< Tecla que permite prender y apagar el led rojo
-    digital_input_t key_turn_on;  //!< Tecla que permite prender el led amarillo
-    digital_input_t key_turn_off; //!< Tecla que permite apagar el led amarillo
+    digital_input_t key_F1;     //!< Tecla que permite prender el led azul (mientras se mantenga pulsado)
+    digital_input_t key_F2;   //!< Tecla que permite prender y apagar el led rojo
+    digital_input_t key_F3;  //!< Tecla que permite prender el led amarillo
+    digital_input_t key_F4; //!< Tecla que permite apagar el led amarillo
     digital_output_t led_blue;    //!< Led azul de la placa EDU-CIAA-NXP
     digital_output_t led_red;     //!< Led rojo de la placa EDU-CIAA-NXP
     digital_output_t led_yellow;  //!< Led amarillo de la placa EDU-CIAA-NXP

@@ -28,6 +28,7 @@ SPDX-License-Identifier: MIT
 #include "chip.h"
 #include "bsp.h"
 #include "edu-ciaa-nxp.h"
+#include "shield.h"
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -70,17 +71,17 @@ board_t BoardCreate() {
         self->led_green = DigitalOutputCreate(LED_3_GPIO, LED_3_BIT);
 
         /******************/
-        Chip_SCU_PinMuxSet(TEC_1_PORT, TEC_1_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | TEC_1_FUNC);
-        self->key_push = DigitalInputCreate(TEC_1_GPIO, TEC_1_BIT, true);
+        Chip_SCU_PinMuxSet(KEY_F1_PORT, KEY_F1_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_F1_FUNC);
+        self->key_F1 = DigitalInputCreate(KEY_F1_GPIO, KEY_F1_BIT, false);
 
-        Chip_SCU_PinMuxSet(TEC_2_PORT, TEC_2_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | TEC_2_FUNC);
-        self->key_toggle = DigitalInputCreate(TEC_2_GPIO, TEC_2_BIT, true);
+        Chip_SCU_PinMuxSet(KEY_F2_PORT, KEY_F2_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_F2_FUNC);
+        self->key_F2 = DigitalInputCreate(KEY_F2_GPIO, KEY_F2_BIT, false);
 
-        Chip_SCU_PinMuxSet(TEC_3_PORT, TEC_3_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | TEC_3_FUNC);
-        self->key_turn_on = DigitalInputCreate(TEC_3_GPIO, TEC_3_BIT, true);
+        Chip_SCU_PinMuxSet(KEY_F3_PORT, KEY_F3_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_F3_FUNC);
+        self->key_F3 = DigitalInputCreate(KEY_F3_GPIO, KEY_F3_BIT, false);
 
-        Chip_SCU_PinMuxSet(TEC_4_PORT, TEC_4_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | TEC_4_FUNC);
-        self->key_turn_off = DigitalInputCreate(TEC_4_GPIO, TEC_4_BIT, true);
+        Chip_SCU_PinMuxSet(KEY_F4_PORT, KEY_F4_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_F4_FUNC);
+        self->key_F4 = DigitalInputCreate(KEY_F4_GPIO, KEY_F4_BIT, false);
     }
 
     return self;
