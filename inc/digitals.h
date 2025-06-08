@@ -64,9 +64,10 @@ typedef struct digital_input_s* digital_input_t;
  *
  * @param gpio_port Puerto GPIO correspondiente a la salida digital
  * @param gpio_bit Bit especiífico del puerto GPIO correspondiente a la salida digital
+ * @param active_low TRUE si es una salida activa en bajo; FALSE si es una salida activa en alto
  * @return digital_output_t Puntero a la estructura que contiene los datos de la salida digital
  */
-digital_output_t DigitalOutputCreate(uint8_t gpio_port, uint8_t gpio_bit);
+digital_output_t DigitalOutputCreate(uint8_t gpio_port, uint8_t gpio_bit, bool active_low);
 
 /**
  * @brief Activa una salida digital GPIO

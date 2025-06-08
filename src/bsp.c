@@ -58,17 +58,17 @@ board_t BoardCreate() {
         Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, LED_G_GPIO, LED_G_BIT, true);
 
         Chip_SCU_PinMuxSet(LED_B_PORT, LED_B_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_B_FUNC);
-        self->led_blue = DigitalOutputCreate(LED_B_GPIO, LED_B_BIT);
+        self->led_blue = DigitalOutputCreate(LED_B_GPIO, LED_B_BIT, false);
 
         /******************/
         Chip_SCU_PinMuxSet(LED_1_PORT, LED_1_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_1_FUNC);
-        self->led_red = DigitalOutputCreate(LED_1_GPIO, LED_1_BIT);
+        self->led_red = DigitalOutputCreate(LED_1_GPIO, LED_1_BIT, false);
 
         Chip_SCU_PinMuxSet(LED_2_PORT, LED_2_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_2_FUNC);
-        self->led_yellow = DigitalOutputCreate(LED_3_GPIO, LED_2_BIT);
+        self->led_yellow = DigitalOutputCreate(LED_3_GPIO, LED_2_BIT, false);
 
         Chip_SCU_PinMuxSet(LED_3_PORT, LED_3_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_3_FUNC);
-        self->led_green = DigitalOutputCreate(LED_3_GPIO, LED_3_BIT);
+        self->led_green = DigitalOutputCreate(LED_3_GPIO, LED_3_BIT, false);
 
         /******************/
         Chip_SCU_PinMuxSet(KEY_F1_PORT, KEY_F1_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_F1_FUNC);

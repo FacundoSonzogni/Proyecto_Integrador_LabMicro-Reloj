@@ -36,6 +36,7 @@ SPDX-License-Identifier: MIT
 struct digital_output_s {
     uint8_t gpio_port; //!< Puerto GPIO al que pertenece la salida
     uint8_t gpio_bit;  //!< Bit del puerto GPIO al que pertenece la salida
+    bool active_low;   //!< Determina si la salida es activa en bajo o no
 };
 
 /*! Estructura de datos que representa una Entrada Digital GPIO */
@@ -56,14 +57,20 @@ struct digital_input_s {
 
 /* === Public function definitions ================================================================================= */
 
-digital_output_t DigitalOutputCreate(uint8_t gpio_port, uint8_t gpio_bit) {
+digital_output_t DigitalOutputCreate(uint8_t gpio_port, uint8_t gpio_bit, bool active_low) {
     digital_output_t self = malloc(sizeof(struct digital_output_s));
 
     if (self != NULL) {
         self->gpio_port = gpio_port;
         self->gpio_bit = gpio_bit;
+        self->active_low = active_low;
 
-        Chip_GPIO_SetPinState(LPC_GPIO_PORT, gpio_port, gpio_bit, false);
+        if(active_low == true){
+            Chip_GPIO_SetPinState(LPC_GPIO_PORT, gpio_port, gpio_bit, true);
+        }else{
+            Chip_GPIO_SetPinState(LPC_GPIO_PORT, gpio_port, gpio_bit, false);
+        }
+        
         Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, gpio_port, gpio_bit, true);
     }
 
@@ -71,11 +78,21 @@ digital_output_t DigitalOutputCreate(uint8_t gpio_port, uint8_t gpio_bit) {
 }
 
 void DigitalOutputActivate(digital_output_t self) {
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, self->gpio_port, self->gpio_bit, true);
+    if(self->active_low == true){
+        Chip_GPIO_SetPinState(LPC_GPIO_PORT, self->gpio_port, self->gpio_bit, false);
+    }else{
+        Chip_GPIO_SetPinState(LPC_GPIO_PORT, self->gpio_port, self->gpio_bit, true);
+    }
+    
 }
 
 void DigitalOutputDeactivate(digital_output_t self) {
-    Chip_GPIO_SetPinState(LPC_GPIO_PORT, self->gpio_port, self->gpio_bit, false);
+    if(self->active_low == true){
+        Chip_GPIO_SetPinState(LPC_GPIO_PORT, self->gpio_port, self->gpio_bit, true);
+    }else{
+        Chip_GPIO_SetPinState(LPC_GPIO_PORT, self->gpio_port, self->gpio_bit, false);
+    }
+    
 }
 
 void DigitalOutputToggle(digital_output_t self) {
