@@ -28,6 +28,7 @@ SPDX-License-Identifier: MIT
 /* === Headers files inclusions ==================================================================================== */
 
 #include "digitals.h"
+#include "screen.h"
 
 /* === Header for C++ compatibility ================================================================================ */
 
@@ -48,10 +49,7 @@ typedef struct board_s {
     digital_input_t key_accept;  //!< Tecla "Aceptar" del Poncho
     digital_input_t key_cancel;  //!< Tecla "Cancelar" del Poncho
     digital_output_t led_alarm;  //!< Led RGB (se prende en rojo) del poncho (En el reloj, representaría la alarma)
-    digital_output_t led_blue;    //!< Led azul de la placa EDU-CIAA-NXP
-    digital_output_t led_red;     //!< Led rojo de la placa EDU-CIAA-NXP
-    digital_output_t led_yellow;  //!< Led amarillo de la placa EDU-CIAA-NXP
-    digital_output_t led_green;   //!< Led verde de la placa EDU-CIAA-NXP
+    screen_t screen;             //!< Pantalla formada por los displays 7 segmentos del pocnho
 } const* const board_t;
 
 /* === Public variable declarations ================================================================================ */

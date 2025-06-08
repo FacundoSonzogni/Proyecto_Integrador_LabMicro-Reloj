@@ -25,10 +25,40 @@ SPDX-License-Identifier: MIT
 /* === Headers files inclusions ==================================================================================== */
 
 #include "screen.h"
+#include "bsp.h"
+#include "shield.h"
+#include <stdlib.h>
+#include <string.h>
 
 /* === Macros definitions ========================================================================================== */
 
+#ifndef SCREEN_MAX_DIGITS
+#define SCREEN_MAX_DIGITS 8
+#endif
+
 /* === Private data type declarations ============================================================================== */
+
+/*! Estructura de datos que representa una Pantalla de displays 7 segmentos */
+struct screen_s {
+    uint8_t digits;                          //!< Cantidad de digitos que tiene la pantalla
+    uint8_t memory_video[SCREEN_MAX_DIGITS]; //!< Arreglo en el que cada elemento representa los segmentos (8 bits) de cada uno de los displays
+    uint8_t current_digit;                   //!< Digito actual que se está mostrando en la pantalla
+    screen_driver_t driver;                  //!< Driver de la pantalla con las funciones de callback
+};
+
+/*! Arreglo constante de 10 elementos en los que cada elemnto representa los segmentos correspondientes a cada número del 0 al 9 */
+static const uint8_t DIGIT_MAP[10] = {
+    SEGMENT_A | SEGMENT_B | SEGMENT_C | SEGMENT_D | SEGMENT_E | SEGMENT_F,             //!< Representa los segmentos del número "0"
+    SEGMENT_B | SEGMENT_C,                                                             //!< Representa los segmentos del número "1"
+    SEGMENT_A | SEGMENT_B | SEGMENT_D | SEGMENT_E | SEGMENT_G,                         //!< Representa los segmentos del número "2"
+    SEGMENT_A | SEGMENT_B | SEGMENT_C | SEGMENT_D | SEGMENT_G,                         //!< Representa los segmentos del número "3"
+    SEGMENT_B | SEGMENT_C | SEGMENT_F | SEGMENT_G,                                     //!< Representa los segmentos del número "4"
+    SEGMENT_A | SEGMENT_C | SEGMENT_D | SEGMENT_F | SEGMENT_G,                         //!< Representa los segmentos del número "5"
+    SEGMENT_A | SEGMENT_C | SEGMENT_D | SEGMENT_E | SEGMENT_F | SEGMENT_G,             //!< Representa los segmentos del número "6"
+    SEGMENT_A | SEGMENT_B | SEGMENT_C,                                                 //!< Representa los segmentos del número "7"
+    SEGMENT_A | SEGMENT_B | SEGMENT_C | SEGMENT_D | SEGMENT_E | SEGMENT_F | SEGMENT_G, //!< Representa los segmentos del número "8"
+    SEGMENT_A | SEGMENT_B | SEGMENT_C | SEGMENT_D | SEGMENT_F | SEGMENT_G,             //!< Representa los segmentos del número "9"
+};
 
 /* === Private function declarations =============================================================================== */
 
@@ -39,5 +69,47 @@ SPDX-License-Identifier: MIT
 /* === Private function definitions ================================================================================ */
 
 /* === Public function definitions ================================================================================= */
+
+screen_t ScreenCreate(uint8_t digits, screen_driver_t driver) {
+    screen_t self = malloc(sizeof(struct screen_s));
+
+    if (digits > SCREEN_MAX_DIGITS) {
+        digits = SCREEN_MAX_DIGITS;
+    }
+
+    if (self != NULL) {
+        self->digits = digits;
+        self->driver = driver;
+        self->current_digit = 0;
+    }
+
+    return self;
+}
+
+void ScreenWriteBCD(screen_t self, uint8_t value[], uint8_t size) {
+
+    memset(self->memory_video, 0, sizeof(self->memory_video));
+
+    if (size > self->digits) {
+        size = self->digits;
+    }
+
+    for (int i = 0; i < size; i++) {
+        self->memory_video[i] = DIGIT_MAP[value[i]];
+    }
+}
+
+void ScreenRefresh(screen_t self) {
+    self->driver->DigitsTurnOff();
+
+    if (self->current_digit < self->digits - 1) {
+        self->current_digit = self->current_digit + 1;
+    } else {
+        self->current_digit = 0;
+    }
+
+    self->driver->SegmentsUpdate(self->memory_video[self->current_digit]);
+    self->driver->DigitTurnOn(self->current_digit);
+}
 
 /* === End of documentation ======================================================================================== */

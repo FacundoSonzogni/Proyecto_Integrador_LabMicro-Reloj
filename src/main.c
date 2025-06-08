@@ -32,12 +32,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** \brief Simple sample of use LPC HAL gpio functions
- **
- ** \addtogroup samples Sample projects
- ** \brief Sample projects to use as a starting point
- ** @{ */
-
+/**
+ * @file main.c
+ * @brief Código Fuente principal del proyecto (Por ahora son solo pruebas)
+ * 
+ */
 /* === Headers files inclusions =============================================================== */
 
 #include "digitals.h"
@@ -62,30 +61,12 @@
 int main(void) {
 
     int divisor = 0;
+    uint8_t value[4] = {1, 2, 3, 4};
 
     board_t board = BoardCreate();
+    ScreenWriteBCD(board->screen, value, 4);
 
     while (true) {
-
-        // Lógica para el control del Led Azul
-        if (DigitalInputGetIsActive(board->key_F1)) {
-            DigitalOutputActivate(board->led_blue);
-        } else {
-            DigitalOutputDeactivate(board->led_blue);
-        }
-
-        // Lógica para el control del LED 1 (Rojo)
-        if (DigitalInputWasActivated(board->key_F2)) {
-            DigitalOutputToggle(board->led_red);
-        }
-
-        // Lógica para el control del LED 2 (Amarillo)
-        if (DigitalInputGetIsActive(board->key_F3)) {
-            DigitalOutputActivate(board->led_yellow);
-        }
-        if (DigitalInputGetIsActive(board->key_F4)) {
-            DigitalOutputDeactivate(board->led_yellow);
-        }
 
         // Lógica para el control del LED RGB de Alarma (Rojo)
         if (DigitalInputGetIsActive(board->key_accept)) {
@@ -95,21 +76,20 @@ int main(void) {
             DigitalOutputDeactivate(board->led_alarm);
         }
 
-        // Lógica para el control del LED 3 (Verde)
+        // Lógica para el control del display
+
         divisor++;
         if (divisor == 5) {
             divisor = 0;
-            DigitalOutputToggle(board->led_green);
         }
 
-        for (int index = 0; index < 100; index++) {
-            for (int delay = 0; delay < 25000; delay++) {
-                __asm("NOP");
-            }
+        ScreenRefresh(board->screen);
+
+        for (int delay = 0; delay < 25000; delay++) {
+            __asm("NOP");
         }
+
     }
 }
 
 /* === End of documentation ==================================================================== */
-
-/** @} End of module definition for doxygen */
