@@ -49,6 +49,18 @@ board_t BoardCreate() {
 
     if (self != NULL) {
 
+        Chip_SCU_PinMuxSet(LED_RGB_BLUE_PORT, LED_RGB_BLUE_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_RGB_BLUE_FUNC);
+        Chip_GPIO_SetPinState(LPC_GPIO_PORT, LED_RGB_BLUE_GPIO, LED_RGB_BLUE_BIT, true);
+        Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, LED_RGB_BLUE_GPIO, LED_RGB_BLUE_BIT, true);
+
+        Chip_SCU_PinMuxSet(LED_RGB_GREEN_PORT, LED_RGB_GREEN_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_RGB_GREEN_FUNC);
+        Chip_GPIO_SetPinState(LPC_GPIO_PORT, LED_RGB_GREEN_GPIO, LED_RGB_GREEN_BIT, true);
+        Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, LED_RGB_GREEN_GPIO, LED_RGB_GREEN_BIT, true);
+
+        Chip_SCU_PinMuxSet(LED_RGB_RED_PORT, LED_RGB_RED_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_RGB_RED_FUNC);
+        self->led_alarm = DigitalOutputCreate(LED_RGB_RED_GPIO, LED_RGB_RED_BIT, true);
+
+        /******************/
         Chip_SCU_PinMuxSet(LED_R_PORT, LED_R_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_R_FUNC);
         Chip_GPIO_SetPinState(LPC_GPIO_PORT, LED_R_GPIO, LED_R_BIT, false);
         Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, LED_R_GPIO, LED_R_BIT, true);

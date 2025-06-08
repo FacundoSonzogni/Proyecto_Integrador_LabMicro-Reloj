@@ -61,6 +61,8 @@
 
 int main(void) {
 
+    int divisor = 0;
+
     board_t board = BoardCreate();
 
     while (true) {
@@ -85,12 +87,25 @@ int main(void) {
             DigitalOutputDeactivate(board->led_yellow);
         }
 
-        // Lógica para el control del LED 3 (Verde)
+        // Lógica para el control del LED RGB de Alarma (Rojo)
         if (DigitalInputGetIsActive(board->key_accept)) {
-            DigitalOutputActivate(board->led_green);
+            DigitalOutputActivate(board->led_alarm);
         }
         if (DigitalInputGetIsActive(board->key_cancel)) {
-            DigitalOutputDeactivate(board->led_green);
+            DigitalOutputDeactivate(board->led_alarm);
+        }
+
+        // Lógica para el control del LED 3 (Verde)
+        divisor++;
+        if (divisor == 5) {
+            divisor = 0;
+            DigitalOutputToggle(board->led_green);
+        }
+
+        for (int index = 0; index < 100; index++) {
+            for (int delay = 0; delay < 25000; delay++) {
+                __asm("NOP");
+            }
         }
     }
 }
