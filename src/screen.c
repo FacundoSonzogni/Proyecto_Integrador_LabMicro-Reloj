@@ -43,7 +43,12 @@ struct screen_s {
     uint8_t digits;                          //!< Cantidad de digitos que tiene la pantalla
     uint8_t memory_video[SCREEN_MAX_DIGITS]; //!< Arreglo en el que cada elemento representa los segmentos (8 bits) de cada uno de los displays
     uint8_t current_digit;                   //!< Digito actual que se está mostrando en la pantalla
+    uint8_t flashing_from;                   //!< Digito desde el cual se produce el parapdeo (si es que parpadea)
+    uint8_t flashing_to;                     //!< Digito hasta el cual se produce el parapdeo (si es que parpadea)
+    uint8_t flashing_count;                  //!< Cuenta la cantidad de ciclos que van pasando (si es que parpadea)
+    uint16_t flashing_period;                //!< Período del parpadeo (Cantidad de ciclos totales entre que se enciende, se apaga y se vuelve a encender)
     screen_driver_t driver;                  //!< Driver de la pantalla con las funciones de callback
+    
 };
 
 /*! Arreglo constante de 10 elementos en los que cada elemnto representa los segmentos correspondientes a cada número del 0 al 9 */
@@ -81,6 +86,8 @@ screen_t ScreenCreate(uint8_t digits, screen_driver_t driver) {
         self->digits = digits;
         self->driver = driver;
         self->current_digit = 0;
+        self->flashing_count = 0;
+        self->flashing_period = 0;
     }
 
     return self;
@@ -100,6 +107,9 @@ void ScreenWriteBCD(screen_t self, uint8_t value[], uint8_t size) {
 }
 
 void ScreenRefresh(screen_t self) {
+
+    uint8_t segments;
+
     self->driver->DigitsTurnOff();
 
     if (self->current_digit < self->digits - 1) {
@@ -108,8 +118,42 @@ void ScreenRefresh(screen_t self) {
         self->current_digit = 0;
     }
 
-    self->driver->SegmentsUpdate(self->memory_video[self->current_digit]);
+    segments = self->memory_video[self->current_digit];
+
+    if(self->flashing_period != 0){
+        if(self->current_digit == 0){
+            self->flashing_count = (self->flashing_count + 1) % (self->flashing_period);
+        }
+
+        if(self->flashing_count < (self->flashing_period / 2)){
+            if(self->current_digit >= self->flashing_from){
+                if(self->current_digit <= self->flashing_to){
+                    segments = 0;
+                }
+            }
+            
+        }
+    }
+
+    self->driver->SegmentsUpdate(segments);
     self->driver->DigitTurnOn(self->current_digit);
+}
+
+int ScreenFlashDigits(screen_t self, uint8_t from, uint8_t to, uint16_t half_period){
+    int result = 0;
+
+    if((from > to) || (from >= SCREEN_MAX_DIGITS) || (to >= SCREEN_MAX_DIGITS)){
+        result = -1;
+    }else if(self == NULL){
+        result = -1;
+    }else{
+        self->flashing_from = from;
+        self->flashing_to = to;
+        self->flashing_period = 2 * half_period;
+        self->flashing_count = 0;
+    }
+
+    return result;
 }
 
 /* === End of documentation ======================================================================================== */

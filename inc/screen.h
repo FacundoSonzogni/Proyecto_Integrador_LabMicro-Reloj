@@ -100,6 +100,23 @@ void ScreenWriteBCD(screen_t screen, uint8_t value[], uint8_t size);
  */
 void ScreenRefresh(screen_t screen);
 
+/**
+ * @brief Función que permite el parpadeo de los dígitos de la pantalla
+ * 
+ * @param screen Puntero a la estructura con los datos de la pantalla 
+ * @param from Dígito desde el cual se quiere que empiece a parpadear
+ * @param to Dígito hasta el cual se quiere que empiece a parpadear
+ * @param half_period Cantidad de ciclos que los digitos están encendido (y que están apagados). Semi-período de parpadeo
+ * @return 0 si fue posible el parpadeo. -1 si NO es posible realizar el parpadeo.
+ * 
+ * NOTA: Para realizar el parpadeo, el dígito 0 corresponde al dígito LSB (Unidades).
+ * 
+ * NOTA: Si se quiere que parpadee un solo dígito, se manda el mismo valor para "from" y "to"
+ * 
+ * NOTA: Si half_period = 50, significa que 50 ciclos está prendido y 50 ciclos está apagado (periódo total = 100 ciclos)
+ */
+int ScreenFlashDigits(screen_t screen, uint8_t from, uint8_t to, uint16_t half_period);
+
 /* === End of conditional blocks =================================================================================== */
 
 #ifdef __cplusplus
