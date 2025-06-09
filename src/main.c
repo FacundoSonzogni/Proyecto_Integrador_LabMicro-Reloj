@@ -66,13 +66,14 @@ int main(void) {
     ScreenWriteBCD(board->screen, value, 4);
 
     ScreenSetDotState(board->screen, 0, true);
-    ScreenSetDotState(board->screen, 1, false);
+    ScreenSetDotState(board->screen, 1, true);
     ScreenSetDotState(board->screen, 2, true);
     ScreenSetDotState(board->screen, 3, true);
 
     ScreenFlashDigits(board->screen, 1, 2, 50);
 
     ScreenFlashDot(board->screen, 3, 25);
+    ScreenFlashDot(board->screen, 1, 50);
 
     while (true) {
 
