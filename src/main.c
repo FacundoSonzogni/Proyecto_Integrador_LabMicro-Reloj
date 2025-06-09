@@ -39,7 +39,6 @@
  */
 /* === Headers files inclusions =============================================================== */
 
-#include "digitals.h"
 #include "bsp.h"
 
 /* === Macros definitions ====================================================================== */
@@ -65,15 +64,20 @@ int main(void) {
 
     board_t board = BoardCreate();
     ScreenWriteBCD(board->screen, value, 4);
+
     ScreenSetDotState(board->screen, 0, true);
     ScreenSetDotState(board->screen, 1, false);
     ScreenSetDotState(board->screen, 2, true);
-    ScreenSetDotState(board->screen, 3, false);
+    ScreenSetDotState(board->screen, 3, true);
+
     ScreenFlashDigits(board->screen, 1, 2, 50);
+
+    ScreenFlashDot(board->screen, 3, 25);
 
     while (true) {
 
         // Lógica para el control del LED RGB de Alarma (Rojo)
+
         if (DigitalInputGetIsActive(board->key_accept)) {
             DigitalOutputActivate(board->led_alarm);
         }

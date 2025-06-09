@@ -39,14 +39,16 @@ SPDX-License-Identifier: MIT
 
 /*! Estructura de datos que representa una Pantalla de displays 7 segmentos */
 struct screen_s {
-    uint8_t digits;                          //!< Cantidad de digitos que tiene la pantalla
-    uint8_t memory_video[SCREEN_MAX_DIGITS]; //!< Arreglo en el que cada elemento representa los segmentos (8 bits) de cada uno de los displays
-    uint8_t current_digit;                   //!< Digito actual que se está mostrando en la pantalla
-    uint8_t flashing_from;                   //!< Digito desde el cual se produce el parapdeo (si es que parpadea)
-    uint8_t flashing_to;                     //!< Digito hasta el cual se produce el parapdeo (si es que parpadea)
-    uint8_t flashing_count;                  //!< Cuenta la cantidad de ciclos que van pasando (si es que parpadea)
-    uint16_t flashing_period;                //!< Período del parpadeo (Cantidad de ciclos totales entre que se enciende, se apaga y se vuelve a encender)
-    screen_driver_t driver;                  //!< Driver de la pantalla con las funciones de callback
+    uint8_t digits;                                  //!< Cantidad de digitos que tiene la pantalla
+    uint8_t memory_video[SCREEN_MAX_DIGITS];         //!< Arreglo en el que cada elemento representa los segmentos (8 bits) de cada uno de los displays
+    uint8_t current_digit;                           //!< Digito actual que se está mostrando en la pantalla
+    uint8_t flashing_from;                           //!< Digito desde el cual se produce el parapdeo (si es que parpadean los segmentos)
+    uint8_t flashing_to;                             //!< Digito hasta el cual se produce el parapdeo (si es que parpadean los segmentos)
+    uint8_t flashing_count;                          //!< Cuenta la cantidad de ciclos que van pasando (si es que parpadean los segmentos)
+    uint16_t flashing_period;                        //!< Período del parpadeo de segmentos (Cantidad de ciclos totales entre que se enciende, se apaga y se vuelve a encender)
+    uint8_t flashing_dot_count[SCREEN_MAX_DIGITS];   //!< Cuenta la cantidad de ciclos que van pasando (si es que parpadean los puntos)
+    uint16_t flashing_dot_period[SCREEN_MAX_DIGITS]; //!< Período del parpadeo de los puntos (Cantidad de ciclos totales entre que se enciende, se apaga y se vuelve a encender)
+    screen_driver_t driver;                          //!< Driver de la pantalla con las funciones de callback
     
 };
 
@@ -87,6 +89,12 @@ screen_t ScreenCreate(uint8_t digits, screen_driver_t driver) {
         self->current_digit = 0;
         self->flashing_count = 0;
         self->flashing_period = 0;
+        
+        for(int i = 0; i < self->digits; i++){
+            self->flashing_dot_count[i] = 0;
+            self->flashing_dot_period[i] = 0;
+        }
+        
     }
 
     return self;
@@ -121,6 +129,7 @@ void ScreenRefresh(screen_t self) {
 
     segments = self->memory_video[self->current_digit];
 
+    // Parpadeo de los números (segmentos)
     if(self->flashing_period != 0){
         if(self->current_digit == 0){
             self->flashing_count = (self->flashing_count + 1) % (self->flashing_period);
@@ -133,6 +142,25 @@ void ScreenRefresh(screen_t self) {
                 }
             }
             
+        }
+    }
+
+    //Parpadeo de los puntos
+    for (int i = 0; i < self->digits; i++) {
+        if (self->flashing_dot_period[i] != 0) {
+            if (self->current_digit == 0) {
+                if (self->flashing_dot_count[i] <  self->flashing_dot_period[i] - 1) {
+                    self->flashing_dot_count[i] = self->flashing_dot_count[i] + 1;
+                } else {
+                    self->flashing_dot_count[i] = 0;
+                }
+            }
+
+            if (self->flashing_dot_period[self->current_digit] != 0) {
+                if (self->flashing_dot_count[self->current_digit] < self->flashing_dot_period[self->current_digit] / 2) {
+                    segments = segments & (~SEGMENT_P_MASK);
+                }
+            }
         }
     }
 
@@ -165,16 +193,27 @@ void ScreenSetDotState(screen_t self, uint8_t digit, bool turn_on){
     
     if (self != NULL){
         if(turn_on == true){
-            self->memory_video[3 - digit] = self->memory_video[3 - digit] | SEGMENT_P_MASK;
+            self->memory_video[(self->digits - 1) - digit] = self->memory_video[(self->digits - 1) - digit] | SEGMENT_P_MASK;
         }else if(turn_on == false){
-            self->memory_video[3 - digit] = self->memory_video[3 - digit] & (~SEGMENT_P_MASK);
+            self->memory_video[(self->digits - 1) - digit] = self->memory_video[(self->digits - 1) - digit] & (~SEGMENT_P_MASK);
         }
     }
 
 }
 
 int ScreenFlashDot(screen_t self, uint8_t digit, uint16_t half_period){
-    return 0;
+    int result = 0;
+
+    if(digit >= self->digits){
+        result = -1;
+    }else if(self == NULL){
+        result = -1;
+    }else{
+        self->flashing_dot_period[(self->digits - 1) - digit] = 2 * half_period;
+        self->flashing_dot_count[(self->digits - 1) - digit] = 0;
+    }
+
+    return result;
 }
 
 /* === End of documentation ======================================================================================== */

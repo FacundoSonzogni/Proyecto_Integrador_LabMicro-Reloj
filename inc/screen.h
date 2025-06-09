@@ -114,6 +114,8 @@ void ScreenRefresh(screen_t screen);
  * NOTA: Si se quiere que parpadee un solo dígito, se manda el mismo valor para "from" y "to"
  * 
  * NOTA: Si half_period = 50, significa que 50 ciclos está prendido y 50 ciclos está apagado (periódo total = 100 ciclos)
+ * 
+ * NOTA: Si half_period = 0, los segmentos NO parpadean
  */
 int ScreenFlashDigits(screen_t screen, uint8_t from, uint8_t to, uint16_t half_period);
 
@@ -135,6 +137,8 @@ void ScreenSetDotState(screen_t screen, uint8_t digit, bool turn_on);
  * @return int 0 si fue posible el parpadeo. -1 si NO es posible realizar el parpadeo.
  * 
  * NOTA: Si half_period = 50, significa que 50 ciclos está prendido y 50 ciclos está apagado (periódo total = 100 ciclos)
+ * 
+ * NOTA: Si half_period = 0, el punto NO parpadea
  */
 int ScreenFlashDot(screen_t screen, uint8_t digit, uint16_t half_period);
 

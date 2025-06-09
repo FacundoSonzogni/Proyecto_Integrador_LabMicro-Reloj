@@ -49,28 +49,28 @@ SPDX-License-Identifier: MIT
  * y los iniciliza apagados
  *
  */
-void DigitsInit(void);
+static void DigitsInit(void);
 
 /**
  * @brief Función que configura los segmentos de los displays de la pantalla y
  * los iniciliza apagados
  *
  */
-void SegmentsInit(void);
+static void SegmentsInit(void);
 
 /**
  * @brief Función que configura los puntos de los segmentos de los displays de
  * la pantalla y los iniciliza apagados
  *
  */
-void DotsInit(void);
+static void DotsInit(void);
 
 /**
  * @brief Función que permite deshabilitar todos los displays, de modo que se
  * apaga la pantalla
  *
  */
-void DigitsTurnOff(void);
+static void DigitsTurnOff(void);
 
 /**
  * @brief  Función que permite modificar los segmentos de un correspondiente
@@ -79,19 +79,18 @@ void DigitsTurnOff(void);
  * @param segments Entero de 8 bits, en el que cada bit representa un segmento
  * del display según el numero que se quiera mostrar
  */
-void SegmentsUpdate(uint8_t segments);
+static void SegmentsUpdate(uint8_t segments);
 
 /**
  * @brief Función que permite encender un display específico de la pantalla
  *
  * @param digit Digito específico que se desea habilitar
  */
-void DigitTurnOn(uint8_t digit);
+static void DigitTurnOn(uint8_t digit);
 
 /* === Private variable definitions ================================================================================ */
 
-//! Estructura constante que representa el driver de la pantalla con las
-//! funciones de callback
+//! Estructura constante que representa el driver de la pantalla con las funciones de callback
 static const struct screen_driver_s screen_driver = {
     .DigitsTurnOff = DigitsTurnOff,
     .SegmentsUpdate = SegmentsUpdate,
@@ -102,7 +101,7 @@ static const struct screen_driver_s screen_driver = {
 
 /* === Private function definitions ================================================================================ */
 
-void DigitsInit(void) {
+static void DigitsInit(void) {
 
     // DIGITO_1 es el LSB y DIGITO_4 es el MSB
     Chip_SCU_PinMuxSet(DIGIT_1_PORT, DIGIT_1_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | DIGIT_1_FUNC);
@@ -120,7 +119,7 @@ void DigitsInit(void) {
     Chip_GPIO_ClearValue(LPC_GPIO_PORT, DIGITS_GPIO, DIGITS_MASK);
 }
 
-void SegmentsInit(void) {
+static void SegmentsInit(void) {
 
     Chip_SCU_PinMuxSet(SEGMENT_A_PORT, SEGMENT_A_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | SEGMENT_A_FUNC);
     Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, SEGMENT_A_GPIO, SEGMENT_A_BIT, true);
@@ -146,18 +145,18 @@ void SegmentsInit(void) {
     Chip_GPIO_ClearValue(LPC_GPIO_PORT, SEGMENTS_GPIO, SEGMENTS_MASK);
 }
 
-void DotsInit(void) {
+static void DotsInit(void) {
 
     Chip_SCU_PinMuxSet(SEGMENT_P_PORT, SEGMENT_P_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | SEGMENT_P_FUNC);
     Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, SEGMENT_P_GPIO, SEGMENT_P_BIT, true);
     Chip_GPIO_SetPinState(LPC_GPIO_PORT, SEGMENT_P_GPIO, SEGMENT_P_BIT, false);
 }
 
-void DigitsTurnOff(void) {
+static void DigitsTurnOff(void) {
     Chip_GPIO_ClearValue(LPC_GPIO_PORT, DIGITS_GPIO, DIGITS_MASK);
 }
 
-void SegmentsUpdate(uint8_t segments) {
+static void SegmentsUpdate(uint8_t segments) {
     Chip_GPIO_ClearValue(LPC_GPIO_PORT, SEGMENTS_GPIO, SEGMENTS_MASK);
     Chip_GPIO_SetPinState(LPC_GPIO_PORT, SEGMENT_P_GPIO, SEGMENT_P_BIT, false);
 
@@ -165,8 +164,7 @@ void SegmentsUpdate(uint8_t segments) {
     Chip_GPIO_SetPinState(LPC_GPIO_PORT, SEGMENT_P_GPIO, SEGMENT_P_BIT, (segments & SEGMENT_P));
 }
 
-
-void DigitTurnOn(uint8_t digit) {
+static void DigitTurnOn(uint8_t digit) {
     Chip_GPIO_SetValue(LPC_GPIO_PORT, DIGITS_GPIO, ((1 << (3 - digit)) & DIGITS_MASK));
 }
 
