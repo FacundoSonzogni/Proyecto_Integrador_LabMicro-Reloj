@@ -29,6 +29,7 @@ SPDX-License-Identifier: MIT
 
 #include "digitals.h"
 #include "screen.h"
+#include "shield.h"
 
 /* === Header for C++ compatibility ================================================================================ */
 

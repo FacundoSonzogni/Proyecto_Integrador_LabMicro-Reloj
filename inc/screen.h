@@ -117,6 +117,27 @@ void ScreenRefresh(screen_t screen);
  */
 int ScreenFlashDigits(screen_t screen, uint8_t from, uint8_t to, uint16_t half_period);
 
+/**
+ * @brief Función que permite configurar el estado del punto de uno de los displays
+ * 
+ * @param screen Puntero a la estructura con los datos de la pantalla
+ * @param digit Número del dígito específico cuyo punto se quiere configurar (0 para el LSB)
+ * @param turn_on TRUE si se quiere encender el punto. FALSE si se quiere apagar el punto
+ */
+void ScreenSetDotState(screen_t screen, uint8_t digit, bool turn_on);
+
+/**
+ * @brief Función que permite el parpadeo del punto de uno de los displays
+ * 
+ * @param screen Puntero a la estructura con los datos de la pantalla
+ * @param digit Número del dígito específico cuyo punto se quiere configurar (0 para el LSB)
+ * @param half_period Cantidad de ciclos que los digitos están encendido (y que están apagados). Semi-período de parpadeo
+ * @return int 0 si fue posible el parpadeo. -1 si NO es posible realizar el parpadeo.
+ * 
+ * NOTA: Si half_period = 50, significa que 50 ciclos está prendido y 50 ciclos está apagado (periódo total = 100 ciclos)
+ */
+int ScreenFlashDot(screen_t screen, uint8_t digit, uint16_t half_period);
+
 /* === End of conditional blocks =================================================================================== */
 
 #ifdef __cplusplus

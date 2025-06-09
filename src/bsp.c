@@ -165,6 +165,7 @@ void SegmentsUpdate(uint8_t segments) {
     Chip_GPIO_SetPinState(LPC_GPIO_PORT, SEGMENT_P_GPIO, SEGMENT_P_BIT, (segments & SEGMENT_P));
 }
 
+
 void DigitTurnOn(uint8_t digit) {
     Chip_GPIO_SetValue(LPC_GPIO_PORT, DIGITS_GPIO, ((1 << (3 - digit)) & DIGITS_MASK));
 }

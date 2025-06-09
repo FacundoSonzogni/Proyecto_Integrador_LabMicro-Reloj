@@ -26,7 +26,6 @@ SPDX-License-Identifier: MIT
 
 #include "screen.h"
 #include "bsp.h"
-#include "shield.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -95,7 +94,9 @@ screen_t ScreenCreate(uint8_t digits, screen_driver_t driver) {
 
 void ScreenWriteBCD(screen_t self, uint8_t value[], uint8_t size) {
 
-    memset(self->memory_video, 0, sizeof(self->memory_video));
+    for(int j = 0; j < self->digits; j++){
+        self->memory_video[j] = self->memory_video[j] & SEGMENT_P_MASK;
+    }
 
     if (size > self->digits) {
         size = self->digits;
@@ -128,7 +129,7 @@ void ScreenRefresh(screen_t self) {
         if(self->flashing_count < (self->flashing_period / 2)){
             if(self->current_digit >= self->flashing_from){
                 if(self->current_digit <= self->flashing_to){
-                    segments = 0;
+                    segments = segments & SEGMENT_P_MASK;
                 }
             }
             
@@ -154,6 +155,26 @@ int ScreenFlashDigits(screen_t self, uint8_t from, uint8_t to, uint16_t half_per
     }
 
     return result;
+}
+
+void ScreenSetDotState(screen_t self, uint8_t digit, bool turn_on){
+
+    if(digit >= self->digits ){
+        digit = (self->digits - 1);
+    }  
+    
+    if (self != NULL){
+        if(turn_on == true){
+            self->memory_video[3 - digit] = self->memory_video[3 - digit] | SEGMENT_P_MASK;
+        }else if(turn_on == false){
+            self->memory_video[3 - digit] = self->memory_video[3 - digit] & (~SEGMENT_P_MASK);
+        }
+    }
+
+}
+
+int ScreenFlashDot(screen_t self, uint8_t digit, uint16_t half_period){
+    return 0;
 }
 
 /* === End of documentation ======================================================================================== */

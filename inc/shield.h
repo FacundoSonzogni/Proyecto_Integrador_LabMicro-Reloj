@@ -128,6 +128,7 @@ extern "C" {
 #define SEGMENT_P_FUNC SCU_MODE_FUNC4
 #define SEGMENT_P_GPIO 5
 #define SEGMENT_P_BIT  16
+#define SEGMENT_P_MASK 0x80
 
 // Definiciones de los recursos asociados a las teclas del puncho
 #define KEY_F1_PORT 4
