@@ -92,6 +92,34 @@ bool ClockSetTime(clock_t clock, const clock_time_t* time_set);
  */
 void ClockTick(clock_t clock);
 
+/**
+ * @brief Función que permite incrementar el valor de los minutos
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ */
+void ClockIncrementMinutes(clock_t clock);
+
+/**
+ * @brief Función que permite decrementar el valor de los minutos
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ */
+void ClockDecrementMinutes(clock_t clock);
+
+/**
+ * @brief Función que permite incrementar el valor de las horas
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ */
+void ClockIncrementHours(clock_t clock);
+
+/**
+ * @brief Función que permite decrementar el valor de las horas
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ */
+void ClockDecrementHours(clock_t clock);
+
 /* === End of conditional blocks =================================================================================== */
 
 #ifdef __cplusplus

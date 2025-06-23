@@ -161,4 +161,64 @@ void ClockTick(clock_t self){
         
 }
 
+void ClockIncrementMinutes(clock_t self){
+    if (self->current_time.time.minutes[1] < 9) {
+        self->current_time.time.minutes[1]++;
+    } else {
+        self->current_time.time.minutes[1] = 0;
+        if (self->current_time.time.minutes[0] < 5) {
+            self->current_time.time.minutes[0]++;
+        } else {
+            self->current_time.time.minutes[0] = 0;
+        }
+    }
+}
+
+void ClockDecrementMinutes(clock_t self){
+    if(self->current_time.time.minutes[1] > 0){
+        self->current_time.time.minutes[1]--;
+    } else {
+        self->current_time.time.minutes[1] = 9;
+        if(self->current_time.time.minutes[0] > 0){
+            self->current_time.time.minutes[0]--;
+        } else {
+            self->current_time.time.minutes[0] = 5;
+        }
+        
+    }
+}
+
+void ClockIncrementHours(clock_t self){
+    if(self->current_time.time.hours[0] < 2){
+        if(self->current_time.time.hours[1] < 9){
+            self->current_time.time.hours[1]++;
+        }else{
+            self->current_time.time.hours[1] = 0;
+            self->current_time.time.hours[0]++;
+        }
+    }else if(self->current_time.time.hours[1] < 3){
+        self->current_time.time.hours[1]++;
+    }else{
+        self->current_time.time.hours[1] = 0;
+        self->current_time.time.hours[0] = 0;
+    }
+}
+
+void ClockDecrementHours(clock_t self){
+    if(self->current_time.time.hours[0] > 0){
+        if(self->current_time.time.hours[1] > 0){
+            self->current_time.time.hours[1]--;
+        }else{
+            self->current_time.time.hours[1] = 9;
+            self->current_time.time.hours[0]--;
+        }
+    }else if (self->current_time.time.hours[1] > 0){
+        self->current_time.time.hours[1]--;
+    }else{
+        self->current_time.time.hours[0] = 2;
+        self->current_time.time.hours[1] = 3;
+    }
+    
+}
+
 /* === End of documentation ======================================================================================== */

@@ -42,16 +42,22 @@ SPDX-License-Identifier: MIT
  ** - 14) Probar que las horas pasan de 09 a 10
  ** - 15) Probar que las horas pasan de 19 a 20
  ** - 16) Probar que se pasa de 23:59:59 a 00:00:00
- ** -  Probar que el reloj ingresa al modo de ajuste de hora al recibir la señal de inicio de ajuste (señal de "F1" por más de 3 segundos)
- ** -  Probar que, en modo de ajuste, se puede incrementar el valor de los minutos mediante la señal de "F4"
- ** -  Probar que, en modo de ajuste, se puede disminuir el valor de los minutos mediante la señal de "F3"
- ** -  Probar que el incremento  de minutos realizan un ciclo al alcanzar el valor máximo (59 a 00)
- ** -  Probar que el decremento de minutos realizan un ciclo al alcanzar el valor mínimo (00 a 59)
- ** -  Probar que, al confirmar la configuración de los minutos (señal de "Aceptar"), el ajuste procede a la configuración de la hora
- ** -  Probar que el incremento de horas realizan un ciclo al alcanzar el valor máximo (23 a 00) 
- ** -  Probar que el decremento de horas realizan un ciclo al alcanzar el valor mínimo (00 a 23) 
- ** -  Probar que los cambios pendientes en el ajuste de hora se descartan si no hay interacción de usuario durante un período definido
- ** -  Probar que los cambios pendientes se descartan si se recibe la señal de "Cancelar"
+ ** - 17) Probar que, en modo de ajuste, se puede incrementar el valor de los minutos (mediante la señal de "F4") 
+ ** - 18) Probar que, en modo de ajuste, se puede incrementar el valor de los minutos de _9 a _0
+ ** - 19)  Probar que el incremento  de minutos realizan un ciclo al alcanzar el valor máximo (59 a 00)
+ ** - 20)  Probar que, en modo de ajuste, se puede disminuir el valor de los minutos (mediante la señal de "F3")
+ ** - 21) Probar que, en modo de ajuste, se puede decrementar el valor de los minutos de _0 a _9
+ ** - 22) Probar que el decremento de minutos realizan un ciclo al alcanzar el valor mínimo (00 a 59)
+ ** - 23) Probar que, en modo de ajuste, se puede incrementar el valor de las horas (mediante la señal de "F4")
+ ** - 24) Probar que, en modo de ajuste, se puede incrementar el valor de las horas de 09 a 10
+ ** - 25) Probar que, en modo de ajuste, se puede incrementar el valor de las horas de 19 a 20
+ ** - 26) Probar que, en modo de ajuste, se puede incrementar el valor de las horas de 22 a 23
+ ** - 27)  Probar que el incremento de horas realiza un ciclo al alcanzar el valor máximo (23 a 00)
+ ** - 28) Probar que, en modo de ajuste, se puede decrementar el valor de las horas (mediante la señal de "F3")
+ ** - 29) Probar que, en modo de ajuste, se puede decrementar el valor de las horas de 10 a 09
+ ** - 30) Probar que, en modo de ajuste, se puede decrementar el valor de las horas de 20 a 19
+ ** - 31) Probar que, en modo de ajuste, se puede decrementar el valor de las horas de 01 a 00
+ ** - 32)  Probar que el incremento de horas realiza un ciclo al alcanzar el valor máximo (00 a 23)
  ** -  Probar que se puede definir una alarma para una hora y minutos específicos
  ** -  Probar que la definición de alarma solo acepta el formato de 24 horas
  ** -  Probar que se pueden definir alarmas hasta el límite máximo soportado por el sistema
@@ -369,4 +375,309 @@ void test_time_goes_from_23_59_59_to_00_00_00 (void){
 
     TEST_ASSERT_TIME(0,0,0,0,0,0,new_time);
 }
+
+// 17) Probar que, en modo de ajuste, se puede incrementar el valor de los minutos (mediante la señal de "F4")
+void test_increment_the_value_of_the_minutes (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {2,3},
+        .time.minutes = {4,1},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+    ClockIncrementMinutes(clock);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(2,3,4,2,5,0,new_time);
+}
+
+// 18) Probar que, en modo de ajuste, se puede incrementar el valor de los minutos de _9 a _0
+void test_increment_the_value_of_the_minutes_from_x9_to_y0 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {2,3},
+        .time.minutes = {4,9},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+    ClockIncrementMinutes(clock);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(2,3,5,0,5,0,new_time);
+}
+
+// 19)  Probar que el incremento  de minutos realizan un ciclo al alcanzar el valor máximo (59 a 00)
+void test_increment_the_value_of_the_minutes_from_59_to_00 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {2,3},
+        .time.minutes = {5,9},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+    ClockIncrementMinutes(clock);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(2,3,0,0,5,0,new_time);
+}
+
+// 20)  Probar que, en modo de ajuste, se puede disminuir el valor de los minutos (mediante la señal de "F3")
+void test_decrement_the_value_of_the_minutes (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {2,3},
+        .time.minutes = {4,1},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+    ClockDecrementMinutes(clock);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(2,3,4,0,5,0,new_time);
+}
+
+// 21) Probar que, en modo de ajuste, se puede decrementar el valor de los minutos de _0 a _9
+void test_decrement_the_value_of_the_minutes_from_x0_to_y9 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {2,3},
+        .time.minutes = {4,0},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+    ClockDecrementMinutes(clock);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(2,3,3,9,5,0,new_time);
+}
+
+// 22) Probar que el decremento de minutos realizan un ciclo al alcanzar el valor mínimo (00 a 59)
+void test_decrement_the_value_of_the_minutes_from_00_to_59 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {2,3},
+        .time.minutes = {0,0},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+    ClockDecrementMinutes(clock);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(2,3,5,9,5,0,new_time);
+}
+
+// 23) Probar que, en modo de ajuste, se puede incrementar el valor de las horas (mediante la señal de "F4")
+void test_increment_the_value_of_the_hours (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {1,5},
+        .time.minutes = {4,1},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+    ClockIncrementHours(clock);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(1,6,4,1,5,0,new_time);
+}
+
+// 24) Probar que, en modo de ajuste, se puede incrementar el valor de las horas de 09 a 10
+void test_increment_the_value_of_the_hours_from_09_to_10 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {0,9},
+        .time.minutes = {4,3},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+    ClockIncrementHours(clock);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(1,0,4,3,5,0,new_time);
+}
+
+// 25) Probar que, en modo de ajuste, se puede incrementar el valor de las horas de 19 a 20
+void test_increment_the_value_of_the_hours_from_19_to_20 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {1,9},
+        .time.minutes = {4,3},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+    ClockIncrementHours(clock);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(2,0,4,3,5,0,new_time);
+}
+
+// 26) Probar que, en modo de ajuste, se puede incrementar el valor de las horas de 22 a 23
+void test_increment_the_value_of_the_hours_from_22_to_23 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {2,2},
+        .time.minutes = {4,3},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+    ClockIncrementHours(clock);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(2,3,4,3,5,0,new_time);
+}
+
+// 27)  Probar que el incremento de horas realiza un ciclo al alcanzar el valor máximo (23 a 00)
+void test_increment_the_value_of_the_hours_from_23_to_00 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {2,3},
+        .time.minutes = {5,1},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+    ClockIncrementHours(clock);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(0,0,5,1,5,0,new_time);
+}
+
+// 28) Probar que, en modo de ajuste, se puede decrementar el valor de las horas (mediante la señal de "F3")
+void test_decrement_the_value_of_the_hours (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {1,5},
+        .time.minutes = {4,1},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+    ClockDecrementHours(clock);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(1,4,4,1,5,0,new_time);
+}
+
+// 29) Probar que, en modo de ajuste, se puede decrementar el valor de las horas de 10 a 09
+void test_decrement_the_value_of_the_hours_from_10_to_09 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {1,0},
+        .time.minutes = {4,3},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+    ClockDecrementHours(clock);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(0,9,4,3,5,0,new_time);
+}
+
+// 30) Probar que, en modo de ajuste, se puede decrementar el valor de las horas de 20 a 19
+void test_decrement_the_value_of_the_hours_from_20_to_19 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {2,0},
+        .time.minutes = {4,3},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+    ClockDecrementHours(clock);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(1,9,4,3,5,0,new_time);
+}
+
+// 31) Probar que, en modo de ajuste, se puede decrementar el valor de las horas de 01 a 00
+void test_decrement_the_value_of_the_hours_from_01_to_00 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {0,1},
+        .time.minutes = {4,3},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+    ClockDecrementHours(clock);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(0,0,4,3,5,0,new_time);
+}
+
+// 32)  Probar que el incremento de horas realiza un ciclo al alcanzar el valor máximo (00 a 23)
+void test_decrement_the_value_of_the_hours_from_00_to_23 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {0,0},
+        .time.minutes = {5,1},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+    ClockDecrementHours(clock);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(2,3,5,1,5,0,new_time);
+}
+ 
 /* === End of documentation ======================================================================================== */
