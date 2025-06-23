@@ -37,6 +37,8 @@ SPDX-License-Identifier: MIT
 struct clock_s {
     clock_time_t current_time;
     bool valid_time;
+    uint16_t ticks_per_second;
+    uint16_t current_clock_tick;
 };
 
 /* === Private function declarations =============================================================================== */
@@ -55,6 +57,8 @@ clock_t ClockCreate(uint16_t ticks_per_second){
     clock_t self = malloc(sizeof(struct clock_s));
     if(self != NULL){
         self->valid_time = false;
+        self->ticks_per_second = ticks_per_second;
+        self->current_clock_tick = 0;
         memset(&(self->current_time), 0, sizeof(clock_time_t));
     }
     return self;
@@ -111,7 +115,50 @@ bool ClockSetTime(clock_t self, const clock_time_t *time_set){
 }
 
 void ClockTick(clock_t self){
-    self->current_time.time.seconds[1] = 6;
+
+    self->current_clock_tick++;
+    
+    if(self->current_clock_tick == self->ticks_per_second){
+        self->current_clock_tick = 0;
+
+        // Incremento de segundos
+        if (self->current_time.time.seconds[1] < 9) {
+            self->current_time.time.seconds[1]++;
+        } else {
+            self->current_time.time.seconds[1] = 0;
+            if (self->current_time.time.seconds[0] < 5) {
+                self->current_time.time.seconds[0]++;
+            } else {
+                self->current_time.time.seconds[0] = 0;
+
+                // Incremento de minutos
+                if (self->current_time.time.minutes[1] < 9) {
+                    self->current_time.time.minutes[1]++;
+                } else {
+                    self->current_time.time.minutes[1] = 0;
+                    if (self->current_time.time.minutes[0] < 5) {
+                        self->current_time.time.minutes[0]++;
+                    } else {
+                        self->current_time.time.minutes[0] = 0;
+
+                        // Incremento de horas
+                        if (self->current_time.time.hours[1] < 9) {
+                            self->current_time.time.hours[1]++;
+                        } else {
+                            self->current_time.time.hours[1] = 0;
+                            self->current_time.time.hours[0]++;
+                        }
+
+                        if (self->current_time.time.hours[0] == 2 && self->current_time.time.hours[1] == 4) {
+                            // Pasó de 23:59:59 a 00:00:00
+                            memset(&(self->current_time), 0, sizeof(clock_time_t));
+                        }
+                    }
+                }
+            }
+        }
+    }
+        
 }
 
 /* === End of documentation ======================================================================================== */

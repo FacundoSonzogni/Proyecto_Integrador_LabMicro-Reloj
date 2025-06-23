@@ -34,11 +34,14 @@ SPDX-License-Identifier: MIT
  ** - 6) Probar que se comprueba que los minutos ingresados estén entre 00 y 59
  ** - 7) Probar que se comprueba que los segundos ingresados estén entre 00 y 59
  ** - 8) Probar que puedo setear un valor válido, leer la hora seteada y comprobar que es válida
- ** - 9) Probar que la hora avanza correctamente en un segundo cada vez que se simula un tick de tiempo
- ** - 10) Probar que la hora avanza correctamente a una frecuencia diferente
- ** - 11) Probar que los segundos pasan de 59 a 00 y los minutos avanzan en 1
- ** - 12) Probar que los minutos pasan de 59 a 00 y la hora avanza en 1
- ** - 13) Probar que la hora transiciona correctamente de 23:59:59 a 00:00:00
+ ** - 9) Probar que la hora avanza correctamente en un segundo cada vez que se simulan N ticks de tiempo
+ ** - 10) Probar que los segundos pasan de _9 a _0
+ ** - 11) Probar que cuando los segundos pasan de 59, las unidades de los minutos avanzan en 1
+ ** - 12) Probar que los minutos pasan de _9 a _0
+ ** - 13) Probar que cuando los minutos pasan de 59, las unidades de las horas avanzan en 1
+ ** - 14) Probar que las horas pasan de 09 a 10
+ ** - 15) Probar que las horas pasan de 19 a 20
+ ** - 16) Probar que se pasa de 23:59:59 a 00:00:00
  ** -  Probar que el reloj ingresa al modo de ajuste de hora al recibir la señal de inicio de ajuste (señal de "F1" por más de 3 segundos)
  ** -  Probar que, en modo de ajuste, se puede incrementar el valor de los minutos mediante la señal de "F4"
  ** -  Probar que, en modo de ajuste, se puede disminuir el valor de los minutos mediante la señal de "F3"
@@ -76,6 +79,13 @@ SPDX-License-Identifier: MIT
 /* === Macros definitions ========================================================================================== */
 
 #define CLOCK_TICKS_PER_SECOND 5
+#define TEST_ASSERT_TIME(hours_tens, hours_units, minutes_tens, minutes_units, seconds_tens, seconds_units, expected_time) \
+    TEST_ASSERT_EQUAL_UINT8_MESSAGE(hours_tens, expected_time.bcd[0], "Diference in the tens of hours");         \
+    TEST_ASSERT_EQUAL_UINT8_MESSAGE(hours_units, expected_time.bcd[1], "Diference in the units of hours");       \
+    TEST_ASSERT_EQUAL_UINT8_MESSAGE(minutes_tens, expected_time.bcd[2], "Diference in the tens of minutes");     \
+    TEST_ASSERT_EQUAL_UINT8_MESSAGE(minutes_units, expected_time.bcd[3], "Diference in the units of minutes");   \
+    TEST_ASSERT_EQUAL_UINT8_MESSAGE(seconds_tens, expected_time.bcd[4], "Diference in the tens of seconds");     \
+    TEST_ASSERT_EQUAL_UINT8_MESSAGE(seconds_units, expected_time.bcd[5], "Diference in the units of seconds");   \
 
 /* === Private data type declarations ============================================================================== */
 
@@ -200,7 +210,7 @@ void test_set_valid_time_and_read_it (void){
     
 }
 
-// 9) Probar que la hora avanza correctamente en un segundo cada vez que se simula un tick de tiempo
+// 9) Probar que la hora avanza correctamente en un segundo cada vez que se simulan N ticks de tiempo
 void test_clock_advance_one_second(void){
     clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
     
@@ -210,10 +220,24 @@ void test_clock_advance_one_second(void){
         .time.seconds = {1,5},
     };
 
-    static const clock_time_t expected_time = {
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+
+    SimulateNSeconds(clock, 1);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(1,4,3,0,1,6,new_time);
+}
+
+// 10) Probar que los segundos pasan de _9 a _0
+void test_seconds_from_x9_to_y0 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
         .time.hours = {1,4},
         .time.minutes = {3,0},
-        .time.seconds = {1,6},
+        .time.seconds = {1,9},
     };
 
     clock_time_t new_time;
@@ -223,6 +247,126 @@ void test_clock_advance_one_second(void){
     SimulateNSeconds(clock, 1);
     ClockGetTime(clock, &new_time);
 
-    TEST_ASSERT_EQUAL_UINT8_ARRAY (expected_time.bcd, new_time.bcd, 6);
+    TEST_ASSERT_TIME(1,4,3,0,2,0,new_time);
+}
+
+// 11) Probar que cuando los segundos pasan de 59, las unidades de los minutos avanzan en 1
+void test_seconds_from_59_to_00_and_adding_1_to_minutes(void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {1,4},
+        .time.minutes = {3,0},
+        .time.seconds = {5,9},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+
+    SimulateNSeconds(clock, 1);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(1,4,3,1,0,0,new_time);
+}
+
+// 12) Probar que los minutos pasan de _9 a _0
+void test_minutes_from_x9_to_y0 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {1,4},
+        .time.minutes = {3,9},
+        .time.seconds = {5,9},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+
+    SimulateNSeconds(clock, 1);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(1,4,4,0,0,0,new_time);
+}
+
+// 13) Probar que cuando los minutos pasan de 59, las unidades de las horas avanzan en 1
+void test_minutes_from_59_to_00_and_adding_1_to_hours(void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {1,4},
+        .time.minutes = {5,9},
+        .time.seconds = {5,9},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+
+    SimulateNSeconds(clock, 1);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(1,5,0,0,0,0,new_time);
+}
+
+// 14) Probar que las horas pasan de 09 a 10
+void test_hours_from_9_to_10 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {0,9},
+        .time.minutes = {5,9},
+        .time.seconds = {5,9},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+
+    SimulateNSeconds(clock, 1);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(1,0,0,0,0,0,new_time);
+}
+
+// 15) Probar que las horas pasan de 19 a 20
+void test_hours_from_19_to_20 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {1,9},
+        .time.minutes = {5,9},
+        .time.seconds = {5,9},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+
+    SimulateNSeconds(clock, 1);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(2,0,0,0,0,0,new_time);
+}
+
+// 16) Probar que se pasa de 23:59:59 a 00:00:00
+void test_time_goes_from_23_59_59_to_00_00_00 (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {2,3},
+        .time.minutes = {5,9},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+
+    SimulateNSeconds(clock, 10);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_TIME(0,0,0,0,0,0,new_time);
 }
 /* === End of documentation ======================================================================================== */
