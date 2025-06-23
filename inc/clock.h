@@ -54,16 +54,31 @@ typedef union {
 //! Estructura de datos que representa el Reloj
 typedef struct clock_s* clock_t;
 
+//! Tipo de dato que representa una función que permite encender la alarma
+typedef void (*clock_alarm_turn_on)(clock_t);
+
+//! Tipo de dato que representa una función que permite apagar la alarma
+typedef void (*clock_alarm_turn_of)(clock_t);
+
+/*! Estructura de datos que representa el driver del reloj con las funciones de callback para gestionar la alarma */
+typedef struct clock_alarm_driver_s {
+    clock_alarm_turn_on ClockAlarmTurnOn;  //!< Función que permite encender el sonido de la alarma
+    clock_alarm_turn_of ClockAlarmTurnOff; //!< Función que permite apagar el sonido de la alarma
+} const* clock_alarm_driver_t;
+
 /* === Public variable declarations ================================================================================ */
 
 /* === Public function declarations ================================================================================ */
 
 /**
- * @brief Función que permite crear al onejto Reloj
+ * @brief Función que permite crear al objeto reloj
  *
- * @return clock_t Puntero a la estructura con los datos del reloj
+ * @param ticks_per_second Cantidad de ticks que hay en un segundo
+ * @param snooze_seconds Cantidad de segundos que se pospone la alarma (si es que se pospone)
+ * @param driver Driver con las funciones para encender y apagar la alarma
+ * @return clock_t
  */
-clock_t ClockCreate(uint16_t ticks_per_second, uint16_t snooze_seconds);
+clock_t ClockCreate(uint16_t ticks_per_second, uint16_t snooze_seconds, clock_alarm_driver_t driver);
 
 /**
  * @brief Función que permite obtener la hora actual del reloj
@@ -94,55 +109,55 @@ void ClockTick(clock_t clock);
 
 /**
  * @brief Función que permite incrementar el valor de los minutos
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  */
 void ClockIncrementMinutes(clock_t clock);
 
 /**
  * @brief Función que permite decrementar el valor de los minutos
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  */
 void ClockDecrementMinutes(clock_t clock);
 
 /**
  * @brief Función que permite incrementar el valor de las horas
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  */
 void ClockIncrementHours(clock_t clock);
 
 /**
  * @brief Función que permite decrementar el valor de las horas
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  */
 void ClockDecrementHours(clock_t clock);
 
 /**
  * @brief Función que permite habilitar y setear la hora de la alarma
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  * @param time_set Puntero a la estructura con la hora, minutos y segundos de la alarma
  * @return true Si se pudo setear la alarma
  * @return false Si no se pudo setear la alarma
  */
-bool ClockSetAlarm(clock_t clock, const clock_time_t *time_set);
+bool ClockSetAlarm(clock_t clock, const clock_time_t* time_set);
 
 /**
  * @brief Función que permite leer la hora seteada para la alarma
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  * @param alarm_time Puntero a la estructura donde se guardará la hora de la alarma
  * @return true Si fue posible leer la hora setetada para la alarma
  * @return false Si no fue posible leer la hora setetada para la alarma
  */
-bool ClockGetAlarm(clock_t clock, clock_time_t *alarm_time);
+bool ClockGetAlarm(clock_t clock, clock_time_t* alarm_time);
 
 /**
  * @brief Función que permite saber si la alarma está activada
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  * @return true Si la alarma está activada
  * @return false Si la alarma NO está activada
@@ -151,42 +166,42 @@ bool ClockGetIfAlarmIsActivated(clock_t clock);
 
 /**
  * @brief Función que permite deshabilitar una alarma
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  */
 void ClockDisableAlarm(clock_t clock);
 
 /**
  * @brief Función que permite incrementar el valor de los minutos de la alarma
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  */
 void ClockIncrementAlarmMinutes(clock_t clock);
 
 /**
  * @brief Función que permite decrementar el valor de los minutos de la alarma
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  */
 void ClockDecrementAlarmMinutes(clock_t clock);
 
 /**
  * @brief Función que permite incrementar el valor de las horas de la alarma
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  */
 void ClockIncrementAlarmHours(clock_t clock);
 
 /**
  * @brief Función que permite decrementar el valor de las horas de la alarma
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  */
 void ClockDecrementAlarmHours(clock_t clock);
 
 /**
  * @brief Función que permite hacer que la alarma suene
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  * @return true Si es posible hacer sonar la alarma
  * @return false Si no es poisble hacer sonar la alarma
@@ -195,7 +210,7 @@ bool ClockRingAlarm(clock_t clock);
 
 /**
  * @brief Función que permite saber si la alarma está sonando o no
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  * @return true Si la alarma está sonando
  * @return false Si la alarma no está sonando
@@ -204,28 +219,28 @@ bool ClockGetIfAlarmIsRinging(clock_t clock);
 
 /**
  * @brief Fución que permite habilitar el sonido de la alarma (Significa que PUEDE sonar)
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  */
 void ClockEnableRinging(clock_t clock);
 
 /**
  * @brief Fución que permite deshabilitar el sonido de la alarma (Significa que NO PUEDE sonar)
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  */
 void ClockDisableRingig(clock_t clock);
 
 /**
  * @brief Función que permite posponer una alarma un determinado tiempo
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  */
 void ClockSnoozeAlarm(clock_t clock);
 
 /**
  * @brief Función que permite apagar el sonido de la alarma hasta el otro día
- * 
+ *
  * @param clock Puntero a la estructura con los datos del Reloj
  */
 void ClockCancelAlarm(clock_t clock);
