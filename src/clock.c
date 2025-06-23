@@ -41,6 +41,8 @@ struct clock_s {
     uint16_t current_clock_tick;
     clock_time_t setted_alarm_time;
     bool activated_alarm;
+    bool alarm_is_ringing;
+    bool ringig_is_enabled;
 };
 
 /* === Private function declarations =============================================================================== */
@@ -234,6 +236,9 @@ clock_t ClockCreate(uint16_t ticks_per_second){
         self->current_clock_tick = 0;
         memset(&(self->current_time.bcd), 0, sizeof(clock_time_t));
         memset(&(self->setted_alarm_time.bcd), 0, sizeof(clock_time_t));
+        self->activated_alarm = false;
+        self->alarm_is_ringing = false;
+        self->ringig_is_enabled = true;
     }
     return self;
 }
@@ -284,7 +289,17 @@ void ClockTick(clock_t self){
         if(self->current_clock_tick == self->ticks_per_second){
             self->current_clock_tick = 0;
 
+            if(self->ringig_is_enabled){
+                if(memcmp(&(self->current_time), &(self->setted_alarm_time), sizeof(clock_time_t))){
+                    ClockRingAlarm(self);
+                }
+            }else{
+                self->alarm_is_ringing = false;
+            }
+            
+
             ClockTickIncrement(self);
+            
         }
     }        
 }
@@ -382,5 +397,36 @@ void ClockDecrementAlarmHours(clock_t self){
     if(self != NULL){
         DecrementHours(&(self->setted_alarm_time));
     }
+}
+
+bool ClockRingAlarm(clock_t self){
+    bool result = false;
+    
+    if(self != NULL){
+        if(ClockGetIfAlarmIsActivated(self)){
+            self->alarm_is_ringing = true;
+            result = true;
+        }
+    }
+
+    return result;
+}
+
+bool ClockGetIfAlarmIsRinging(clock_t self){
+    bool result = false;
+    
+    if(self != NULL){
+        result = self->alarm_is_ringing;
+    }
+
+    return result; 
+}
+
+void ClockEnableRinging(clock_t self){
+    self->ringig_is_enabled = true;
+}
+
+void ClockDisableRingig(clock_t self){
+    self->ringig_is_enabled = false;
 }
 /* === End of documentation ======================================================================================== */

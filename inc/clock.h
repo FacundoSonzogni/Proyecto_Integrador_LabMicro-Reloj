@@ -184,6 +184,38 @@ void ClockIncrementAlarmHours(clock_t clock);
  */
 void ClockDecrementAlarmHours(clock_t clock);
 
+/**
+ * @brief Función que permite hacer que la alarma suene
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ * @return true Si es posible hacer sonar la alarma
+ * @return false Si no es poisble hacer sonar la alarma
+ */
+bool ClockRingAlarm(clock_t clock);
+
+/**
+ * @brief Función que permite saber si la alarma está sonando o no
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ * @return true Si la alarma está sonando
+ * @return false Si la alarma no está sonando
+ */
+bool ClockGetIfAlarmIsRinging(clock_t clock);
+
+/**
+ * @brief Fución que permite habilitar el sonido de la alarma (Significa que PUEDE sonar)
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ */
+void ClockEnableRinging(clock_t clock);
+
+/**
+ * @brief Fución que permite deshabilitar el sonido de la alarma (Significa que NO PUEDE sonar)
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ */
+void ClockDisableRingig(clock_t clock);
+
 /* === End of conditional blocks =================================================================================== */
 
 #ifdef __cplusplus

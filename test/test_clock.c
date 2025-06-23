@@ -930,21 +930,164 @@ void test_decrement_the_value_of_the_hours_of_the_alarm (void){
     TEST_ASSERT_TIME(2,2,4,1,5,0,new_alarm);
 }
 
-//  Probar que se puede hacer sonar la alarma
-//  Probar que se puede saber si la alarma está sonando o no
-//  Probar que la alarma suena únicamente si está activada
-//  Probar que la alarma suena si la hora actual coincide con la hora seteada de la alarma
-//  Probar que al crear el reloj, la alrma no suena
-//  Probar que la alarma suena al llegar a la hora indicada SOLO si está activada
-//  Probar que si la alarma está sonando, se puede hacer que deje de sonar (por que se pospuso o por que se apagó)
+// 50) Probar que se puede hacer sonar la alarma
+void test_alarm_can_ring (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t alarm_time = {
+        .time.hours = {2,3},
+        .time.minutes = {4,1},
+        .time.seconds = {5,0},
+    };
+
+    ClockSetAlarm(clock, &alarm_time);
+    TEST_ASSERT_TRUE(ClockRingAlarm(clock));
+
+}
+
+// 51) Probar que se puede saber si la alarma está sonando o no
+void test_get_if_alarm_is_ringing (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t alarm_time = {
+        .time.hours = {2,3},
+        .time.minutes = {4,1},
+        .time.seconds = {5,0},
+    };
+
+    ClockSetAlarm(clock, &alarm_time);
+    TEST_ASSERT_TRUE(ClockRingAlarm(clock));
+    TEST_ASSERT_TRUE(ClockGetIfAlarmIsRinging(clock));
+}
+// 52) Probar que la alarma suena únicamente si está activada
+void test_alarm_only_rings_if_activated (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t alarm_time = {
+        .time.hours = {2,3},
+        .time.minutes = {6,1},
+        .time.seconds = {3,4},
+    };
+
+    ClockSetAlarm(clock, &alarm_time);
+    ClockRingAlarm(clock);
+    TEST_ASSERT_FALSE(ClockGetIfAlarmIsRinging(clock));
+}
+
+// 53) Probar que al crear el reloj, la alarma no suena
+void test_alarm_is_not_ringing_when_the_clock_is_created (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    TEST_ASSERT_FALSE(ClockGetIfAlarmIsRinging(clock));
+}
+
+// 54) Probar que la alarma suena si la hora actual coincide con la hora seteada de la alarma
+void test_alarm_rings_when_alarm_time_is_reached(void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {1,3},
+        .time.minutes = {5,1},
+        .time.seconds = {2,4},
+    };
+    
+    static const clock_time_t alarm_time = {
+        .time.hours = {1,3},
+        .time.minutes = {5,1},
+        .time.seconds = {3,4},
+    };
+
+    ClockSetTime(clock, &current_time);
+    ClockSetAlarm(clock, &alarm_time);
+
+    SimulateNSeconds(clock, 10);
+    TEST_ASSERT_TRUE(ClockGetIfAlarmIsRinging(clock));
+}
+// 55) Probar que la alarma sigue sonando indefinidamente luego de haber alcanzado la hora deseada, si es que no se detiene
+void test_alarm_keeps_ringing_after_alarm_time_was_reached(void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {1,3},
+        .time.minutes = {5,1},
+        .time.seconds = {2,4},
+    };
+    
+    static const clock_time_t alarm_time = {
+        .time.hours = {1,3},
+        .time.minutes = {5,1},
+        .time.seconds = {3,4},
+    };
+
+    ClockSetTime(clock, &current_time);
+    ClockSetAlarm(clock, &alarm_time);
+
+    SimulateNSeconds(clock, 20);
+    TEST_ASSERT_TRUE(ClockGetIfAlarmIsRinging(clock));
+}
+
+// 56) Probar que la alarma suena al llegar a la hora indicada SOLO si está activada
+void test_alarm_rings_when_alarm_time_reached_only_if_activated (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {1,3},
+        .time.minutes = {5,1},
+        .time.seconds = {2,4},
+    };
+    
+    static const clock_time_t alarm_time = {
+        .time.hours = {1,3},
+        .time.minutes = {5,1},
+        .time.seconds = {3,4},
+    };
+
+    ClockSetTime(clock, &current_time);
+    ClockSetAlarm(clock, &alarm_time);
+
+    ClockDisableAlarm(clock);
+
+    SimulateNSeconds(clock, 20);
+    TEST_ASSERT_FALSE(ClockGetIfAlarmIsRinging(clock));
+}
+
+// 57) Probar que si la alarma está sonando, se puede hacer que deje de sonar (por que se pospuso o por que se apagó)
+void test_alarm_can_stop_ringing_if_desired (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t current_time = {
+        .time.hours = {1,3},
+        .time.minutes = {5,1},
+        .time.seconds = {2,4},
+    };
+    
+    static const clock_time_t alarm_time = {
+        .time.hours = {1,3},
+        .time.minutes = {5,1},
+        .time.seconds = {3,4},
+    };
+
+    ClockSetTime(clock, &current_time);
+    ClockSetAlarm(clock, &alarm_time);
+
+    SimulateNSeconds(clock, 10);
+    TEST_ASSERT_TRUE(ClockGetIfAlarmIsRinging(clock));
+
+    ClockDisableRingig(clock);
+
+    SimulateNSeconds(clock, 1);
+    TEST_ASSERT_FALSE(ClockGetIfAlarmIsRinging(clock));
+}
+
 
 //  Probar que se puede posponer la alarma por un determinado tiempo (Mediante la señal "Aceptar" si es que está sonando)
 //  Probar que se puede apagar la alarma, sin deshabilitarla, para que suene el día siguiente (Mediante la señal "Cancelar" si es que está sonando)
+//  Probar que al crear el reloj, no haya ninguna alarma pospuesta
 //  Probar que se puede saber si la alarma ha sido pospuesta o no
 //  Probar que se puede saber por cuanto tiempo ha sido pospuesta la alarma
 //  Probar que solo se puede posponer una alarma si está activada
-//  Probar que si se pospuso la alamra un determinado tiempo (o un día), pasado ese tiempo vuelve a sonar
-//  Probar que al crear el reloj, no haya ninguna alarma pospuesta
+//  Probar que si se pospuso la alarma un determinado tiempo (o un día), pasado ese tiempo vuelve a sonar a la hora seteada inicialmente
+
 
 
 
