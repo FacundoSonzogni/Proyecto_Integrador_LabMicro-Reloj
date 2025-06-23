@@ -120,6 +120,70 @@ void ClockIncrementHours(clock_t clock);
  */
 void ClockDecrementHours(clock_t clock);
 
+/**
+ * @brief Función que permite habilitar y setear la hora de la alarma
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ * @param time_set Puntero a la estructura con la hora, minutos y segundos de la alarma
+ * @return true Si se pudo setear la alarma
+ * @return false Si no se pudo setear la alarma
+ */
+bool ClockSetAlarm(clock_t clock, const clock_time_t *time_set);
+
+/**
+ * @brief Función que permite leer la hora seteada para la alarma
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ * @param alarm_time Puntero a la estructura donde se guardará la hora de la alarma
+ * @return true Si fue posible leer la hora setetada para la alarma
+ * @return false Si no fue posible leer la hora setetada para la alarma
+ */
+bool ClockGetAlarm(clock_t clock, clock_time_t *alarm_time);
+
+/**
+ * @brief Función que permite saber si la alarma está activada
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ * @return true Si la alarma está activada
+ * @return false Si la alarma NO está activada
+ */
+bool ClockGetIfAlarmIsActivated(clock_t clock);
+
+/**
+ * @brief Función que permite deshabilitar una alarma
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ */
+void ClockDisableAlarm(clock_t clock);
+
+/**
+ * @brief Función que permite incrementar el valor de los minutos de la alarma
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ */
+void ClockIncrementAlarmMinutes(clock_t clock);
+
+/**
+ * @brief Función que permite decrementar el valor de los minutos de la alarma
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ */
+void ClockDecrementAlarmMinutes(clock_t clock);
+
+/**
+ * @brief Función que permite incrementar el valor de las horas de la alarma
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ */
+void ClockIncrementAlarmHours(clock_t clock);
+
+/**
+ * @brief Función que permite decrementar el valor de las horas de la alarma
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ */
+void ClockDecrementAlarmHours(clock_t clock);
+
 /* === End of conditional blocks =================================================================================== */
 
 #ifdef __cplusplus

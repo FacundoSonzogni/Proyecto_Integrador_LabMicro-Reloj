@@ -44,24 +44,22 @@ SPDX-License-Identifier: MIT
  ** - 16) Probar que se pasa de 23:59:59 a 00:00:00
  ** - 17) Probar que, en modo de ajuste, se puede incrementar el valor de los minutos (mediante la señal de "F4") 
  ** - 18) Probar que, en modo de ajuste, se puede incrementar el valor de los minutos de _9 a _0
- ** - 19)  Probar que el incremento  de minutos realizan un ciclo al alcanzar el valor máximo (59 a 00)
- ** - 20)  Probar que, en modo de ajuste, se puede disminuir el valor de los minutos (mediante la señal de "F3")
+ ** - 19) Probar que el incremento  de minutos realizan un ciclo al alcanzar el valor máximo (59 a 00)
+ ** - 20) Probar que, en modo de ajuste, se puede disminuir el valor de los minutos (mediante la señal de "F3")
  ** - 21) Probar que, en modo de ajuste, se puede decrementar el valor de los minutos de _0 a _9
  ** - 22) Probar que el decremento de minutos realizan un ciclo al alcanzar el valor mínimo (00 a 59)
  ** - 23) Probar que, en modo de ajuste, se puede incrementar el valor de las horas (mediante la señal de "F4")
  ** - 24) Probar que, en modo de ajuste, se puede incrementar el valor de las horas de 09 a 10
  ** - 25) Probar que, en modo de ajuste, se puede incrementar el valor de las horas de 19 a 20
  ** - 26) Probar que, en modo de ajuste, se puede incrementar el valor de las horas de 22 a 23
- ** - 27)  Probar que el incremento de horas realiza un ciclo al alcanzar el valor máximo (23 a 00)
+ ** - 27) Probar que el incremento de horas realiza un ciclo al alcanzar el valor máximo (23 a 00)
  ** - 28) Probar que, en modo de ajuste, se puede decrementar el valor de las horas (mediante la señal de "F3")
  ** - 29) Probar que, en modo de ajuste, se puede decrementar el valor de las horas de 10 a 09
  ** - 30) Probar que, en modo de ajuste, se puede decrementar el valor de las horas de 20 a 19
  ** - 31) Probar que, en modo de ajuste, se puede decrementar el valor de las horas de 01 a 00
- ** - 32)  Probar que el incremento de horas realiza un ciclo al alcanzar el valor máximo (00 a 23)
- ** -  Probar que se puede definir una alarma para una hora y minutos específicos
+ ** - 32) Probar que el incremento de horas realiza un ciclo al alcanzar el valor máximo (00 a 23)
+ ** - 33) Probar que se puede definir una alarma para una hora y minutos específicos
  ** -  Probar que la definición de alarma solo acepta el formato de 24 horas
- ** -  Probar que se pueden definir alarmas hasta el límite máximo soportado por el sistema
- ** -  Probar que se rechaza la definición de alarmas adicionales si se supera el límite máximo
  ** -  Probar que se puede eliminar una alarma existente
  ** -  Probar que la alarma se puede habilitar
  ** -  Probar que la alarma se puede inhabilitar
@@ -69,8 +67,6 @@ SPDX-License-Identifier: MIT
  ** -  Probar que la alarma se desactiva mediante la señal de "Cancelar" en modo normal del reloj
  ** -  Probar que la alarma se activa precisamente a la hora y minuto definidos
  ** -  Probar que la alarma no se activa si está inhabilitada
- ** -  Probar que si hay múltiples alarmas configuradas para el mismo minuto, todas se activan
- ** -  Probar que una alarma de un solo uso se activa una única vez
  ** -  Probar que cuando la alarma se activa, una señal de "Aceptar" la pospone por cinco minutos
  ** -  Probar que cuando la alarma se activa, una señal de "Cancelar" la silencia hasta el día siguiente a la hora programada
  ** -  Probar que el reloj ingresa al modo de ajuste de la alarma al recibir la señal de inicio de ajuste (señal de "F2" por más de 3 segundos)
@@ -208,7 +204,7 @@ void test_set_valid_time_and_read_it (void){
         .time.seconds = {3,0},
     };
 
-    clock_time_t current_time;
+    clock_time_t current_time = {0};
 
     TEST_ASSERT_TRUE(ClockSetTime(clock, &new_time));
     TEST_ASSERT_TRUE(ClockGetTime(clock, &current_time));
@@ -226,7 +222,7 @@ void test_clock_advance_one_second(void){
         .time.seconds = {1,5},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
 
@@ -246,7 +242,7 @@ void test_seconds_from_x9_to_y0 (void){
         .time.seconds = {1,9},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
 
@@ -266,7 +262,7 @@ void test_seconds_from_59_to_00_and_adding_1_to_minutes(void){
         .time.seconds = {5,9},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
 
@@ -286,7 +282,7 @@ void test_minutes_from_x9_to_y0 (void){
         .time.seconds = {5,9},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
 
@@ -306,7 +302,7 @@ void test_minutes_from_59_to_00_and_adding_1_to_hours(void){
         .time.seconds = {5,9},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
 
@@ -326,7 +322,7 @@ void test_hours_from_9_to_10 (void){
         .time.seconds = {5,9},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
 
@@ -346,7 +342,7 @@ void test_hours_from_19_to_20 (void){
         .time.seconds = {5,9},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
 
@@ -366,7 +362,7 @@ void test_time_goes_from_23_59_59_to_00_00_00 (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
 
@@ -386,7 +382,7 @@ void test_increment_the_value_of_the_minutes (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
     ClockIncrementMinutes(clock);
@@ -405,7 +401,7 @@ void test_increment_the_value_of_the_minutes_from_x9_to_y0 (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
     ClockIncrementMinutes(clock);
@@ -424,7 +420,7 @@ void test_increment_the_value_of_the_minutes_from_59_to_00 (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
     ClockIncrementMinutes(clock);
@@ -443,7 +439,7 @@ void test_decrement_the_value_of_the_minutes (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
     ClockDecrementMinutes(clock);
@@ -462,7 +458,7 @@ void test_decrement_the_value_of_the_minutes_from_x0_to_y9 (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
     ClockDecrementMinutes(clock);
@@ -481,7 +477,7 @@ void test_decrement_the_value_of_the_minutes_from_00_to_59 (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
     ClockDecrementMinutes(clock);
@@ -500,7 +496,7 @@ void test_increment_the_value_of_the_hours (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
     ClockIncrementHours(clock);
@@ -519,7 +515,7 @@ void test_increment_the_value_of_the_hours_from_09_to_10 (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
     ClockIncrementHours(clock);
@@ -538,7 +534,7 @@ void test_increment_the_value_of_the_hours_from_19_to_20 (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
     ClockIncrementHours(clock);
@@ -557,7 +553,7 @@ void test_increment_the_value_of_the_hours_from_22_to_23 (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
     ClockIncrementHours(clock);
@@ -576,7 +572,7 @@ void test_increment_the_value_of_the_hours_from_23_to_00 (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
     ClockIncrementHours(clock);
@@ -595,7 +591,7 @@ void test_decrement_the_value_of_the_hours (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
     ClockDecrementHours(clock);
@@ -614,7 +610,7 @@ void test_decrement_the_value_of_the_hours_from_10_to_09 (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
     ClockDecrementHours(clock);
@@ -633,7 +629,7 @@ void test_decrement_the_value_of_the_hours_from_20_to_19 (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
     ClockDecrementHours(clock);
@@ -652,7 +648,7 @@ void test_decrement_the_value_of_the_hours_from_01_to_00 (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
     ClockDecrementHours(clock);
@@ -671,7 +667,7 @@ void test_decrement_the_value_of_the_hours_from_00_to_23 (void){
         .time.seconds = {5,0},
     };
 
-    clock_time_t new_time;
+    clock_time_t new_time = {0};
 
     ClockSetTime(clock, &current_time);
     ClockDecrementHours(clock);
@@ -679,5 +675,279 @@ void test_decrement_the_value_of_the_hours_from_00_to_23 (void){
 
     TEST_ASSERT_TIME(2,3,5,1,5,0,new_time);
 }
+
+// 33) Probar que se puede definir una alarma para una hora y minutos específicos
+void test_set_alarm_for_specific_time (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t setted_alarm_time = {
+        .time.hours = {1,3},
+        .time.minutes = {5,1},
+        .time.seconds = {3,0},
+    };
+
+    TEST_ASSERT_TRUE(ClockSetAlarm(clock, &setted_alarm_time));
+
+}
+
+// 34) Probar que se puede consultar el valor que se seteó para la hora de la alarma
+void test_get_alarm_time (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t setted_alarm_time = {
+        .time.hours = {1,3},
+        .time.minutes = {5,1},
+        .time.seconds = {3,0},
+    };
+
+    clock_time_t current_alarm_time = {0};
+
+    TEST_ASSERT_TRUE(ClockSetAlarm(clock, &setted_alarm_time));
+    TEST_ASSERT_TRUE(ClockGetAlarm(clock, &current_alarm_time));
+
+    TEST_ASSERT_EQUAL_UINT8_ARRAY (setted_alarm_time.bcd, current_alarm_time.bcd, 6);
+
+}
+
+// 35) Probar que solo se pueda setear una alarma con segundos válidos
+void test_setted_alarm_seconds_is_valid (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t setted_alarm_time = {
+        .time.hours = {1,3},
+        .time.minutes = {5,1},
+        .time.seconds = {7,0},
+    };
+
+    TEST_ASSERT_FALSE(ClockSetAlarm(clock, &setted_alarm_time));
+}
+
+// 36) Probar que solo se pueda setear una alarma con minutos válidos
+void test_setted_alarm_minutes_is_valid (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t setted_alarm_time = {
+        .time.hours = {1,3},
+        .time.minutes = {6,0},
+        .time.seconds = {3,0},
+    };
+
+    TEST_ASSERT_FALSE(ClockSetAlarm(clock, &setted_alarm_time));
+}
+
+// 37) Probar que solo se pueda setear una alarma con hora válida
+void test_setted_alarm_hours_is_valid (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t setted_alarm_time = {
+        .time.hours = {2,4},
+        .time.minutes = {4,0},
+        .time.seconds = {3,0},
+    };
+
+    TEST_ASSERT_FALSE(ClockSetAlarm(clock, &setted_alarm_time));
+}
+
+// 38) Probar que ClockSetAlarm() activa la alarma (Mediante la señal "Aceptar" en modo de funcionamiento normal)
+void test_get_if_the_alarm_is_enabled (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t setted_alarm_time = {
+        .time.hours = {1,3},
+        .time.minutes = {5,1},
+        .time.seconds = {3,0},
+    };
+
+    ClockSetAlarm(clock, &setted_alarm_time);
+
+    TEST_ASSERT_TRUE(ClockGetIfAlarmIsActivated(clock));
+}
+
+// 39) Probar que se puede distinguir si la alarma no está activada porque nunca se seteó un valor
+void test_get_if_alarm_is_activated_if_it_was_never_setted (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    TEST_ASSERT_FALSE(ClockGetIfAlarmIsActivated(clock));
+}
+
+// 40) Probar que se puede distinguir si la alarma no está activada porque se intento setear un valor incorrecto
+void test_if_alarm_is_activated_if_setted_value_was_invalid (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t setted_alarm_time = {
+        .time.hours = {2,4},
+        .time.minutes = {5,1},
+        .time.seconds = {3,0},
+    };
+
+    ClockSetAlarm(clock, &setted_alarm_time);
+
+    TEST_ASSERT_FALSE(ClockGetIfAlarmIsActivated(clock));
+}
+
+//  41) Probar que solo se puede consultar el valor de la hora fijada para la alarma si la alarma está activada 
+void test_setted_alarm_can_be_read_only_if_it_was_activated(void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t setted_alarm_time = {
+        .time.hours = {1,3},
+        .time.minutes = {6,1},
+        .time.seconds = {3,0},
+    };
+    clock_time_t current_alarm_time = {0};
+
+    ClockSetAlarm(clock, &setted_alarm_time);
+
+    TEST_ASSERT_FALSE(ClockGetAlarm(clock, &current_alarm_time));
+    TEST_ASSERT_TIME(0,0,0,0,0,0, current_alarm_time);
+
+}
+//  42) Probar la función ClockSetAlarm() con NULL como argumento 'clock' 
+void test_ClockSetAlarm_with_argument_NULL (void){
+    clock_t clock = NULL;
+    
+    static const clock_time_t setted_alarm_time = {
+        .time.hours = {1,4},
+        .time.minutes = {5,1},
+        .time.seconds = {3,0},
+    };
+
+    TEST_ASSERT_FALSE(ClockSetAlarm(clock, &setted_alarm_time));
+}
+//  43) Probar la función ClockGetAlarm() con NULL como argumento 'clock' 
+void test_ClockGetAlarm_with_argument_NULL (void){
+    clock_t clock = NULL;
+    
+    static const clock_time_t current_alarm_time = {0};
+
+    TEST_ASSERT_FALSE(ClockSetAlarm(clock, &current_alarm_time));
+}
+
+//  44) Comprobar que se puede deshabilitar la alarma (Mediante la señal "Cancelar" en modo de funcionamiento normal)
+void test_alarm_can_be_disabled (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t setted_alarm_time = {
+        .time.hours = {1,3},
+        .time.minutes = {3,1},
+        .time.seconds = {3,0},
+    };
+
+    ClockSetAlarm(clock, &setted_alarm_time);
+    ClockDisableAlarm(clock);
+    TEST_ASSERT_FALSE(ClockGetIfAlarmIsActivated(clock));
+}
+//  45) Comprobar que se puede volver a habilitar una alarma que había sido desactivada
+void test_alarm_can_be_reenabled (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t setted_alarm_time = {
+        .time.hours = {1,3},
+        .time.minutes = {3,1},
+        .time.seconds = {3,0},
+    };
+
+    ClockSetAlarm(clock, &setted_alarm_time);
+    ClockDisableAlarm(clock);
+    TEST_ASSERT_FALSE(ClockGetIfAlarmIsActivated(clock));
+
+    ClockSetAlarm(clock, &setted_alarm_time);
+    TEST_ASSERT_TRUE(ClockGetIfAlarmIsActivated(clock));
+}
+
+//  46) Probar que, en el modo de ajuste de la alamra, se puede incrementar el valor de los minutos (mediante la señal de "F4")
+void test_increment_the_value_of_the_minutes_of_the_alarm (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t alarm_time = {
+        .time.hours = {2,3},
+        .time.minutes = {4,1},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_alarm = {0};
+
+    ClockSetAlarm(clock, &alarm_time);
+    ClockIncrementAlarmMinutes(clock);
+    ClockGetAlarm(clock, &new_alarm);
+
+    TEST_ASSERT_TIME(2,3,4,2,5,0,new_alarm);
+}
+
+// 47) Probar que, en el modo de ajuste de la alamra, se puede decrementar el valor de los minutos (mediante la señal de "F3")
+void test_decrement_the_value_of_the_minutes_of_the_alarm (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t alarm_time = {
+        .time.hours = {2,3},
+        .time.minutes = {4,1},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_alarm = {0};
+
+    ClockSetAlarm(clock, &alarm_time);
+    ClockDecrementAlarmMinutes(clock);
+    ClockGetAlarm(clock, &new_alarm);
+
+    TEST_ASSERT_TIME(2,3,4,0,5,0,new_alarm);
+}
+
+// 48) Probar que, en el modo de ajuste de la alamra, se puede incrementar el valor de las horas (mediante la señal de "F4")
+void test_increment_the_value_of_the_hours_of_the_alarm (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t alarm_time = {
+        .time.hours = {2,3},
+        .time.minutes = {4,1},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_alarm = {0};
+
+    ClockSetAlarm(clock, &alarm_time);
+    ClockIncrementAlarmHours(clock);
+    ClockGetAlarm(clock, &new_alarm);
+
+    TEST_ASSERT_TIME(0,0,4,1,5,0,new_alarm);
+}
+// 49) Probar que, en el modo de ajuste de la alamra, se puede decrementar el valor de las horas (mediante la señal de "F3")
+void test_decrement_the_value_of_the_hours_of_the_alarm (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t alarm_time = {
+        .time.hours = {2,3},
+        .time.minutes = {4,1},
+        .time.seconds = {5,0},
+    };
+
+    clock_time_t new_alarm = {0};
+
+    ClockSetAlarm(clock, &alarm_time);
+    ClockDecrementAlarmHours(clock);
+    ClockGetAlarm(clock, &new_alarm);
+
+    TEST_ASSERT_TIME(2,2,4,1,5,0,new_alarm);
+}
+
+//  Probar que se puede hacer sonar la alarma
+//  Probar que se puede saber si la alarma está sonando o no
+//  Probar que la alarma suena únicamente si está activada
+//  Probar que la alarma suena si la hora actual coincide con la hora seteada de la alarma
+//  Probar que al crear el reloj, la alrma no suena
+//  Probar que la alarma suena al llegar a la hora indicada SOLO si está activada
+//  Probar que si la alarma está sonando, se puede hacer que deje de sonar (por que se pospuso o por que se apagó)
+
+//  Probar que se puede posponer la alarma por un determinado tiempo (Mediante la señal "Aceptar" si es que está sonando)
+//  Probar que se puede apagar la alarma, sin deshabilitarla, para que suene el día siguiente (Mediante la señal "Cancelar" si es que está sonando)
+//  Probar que se puede saber si la alarma ha sido pospuesta o no
+//  Probar que se puede saber por cuanto tiempo ha sido pospuesta la alarma
+//  Probar que solo se puede posponer una alarma si está activada
+//  Probar que si se pospuso la alamra un determinado tiempo (o un día), pasado ese tiempo vuelve a sonar
+//  Probar que al crear el reloj, no haya ninguna alarma pospuesta
+
+
+
+
  
 /* === End of documentation ======================================================================================== */
