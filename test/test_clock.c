@@ -26,48 +26,56 @@ SPDX-License-Identifier: MIT
 /** @file test_clock.c
  ** @brief Pruebas para seguir un patrón TDD para la bliblioteca de Reloj
  ** LISTADO DE PRUEBAS:
- ** - Probar que se pudo crear el objeto Reloj
- ** - Probar que el reloj, al iniciar, se encuentra en un estado "no configurado"
- ** - Probar que el reloj se inicializa internamente en 00:00 
- ** - Probar que se puede establecer la hora a un valor válido
- ** - Probar que se pueden establecer los minutos a un valor válido
- ** - Probar que se aceptan horas en el rango de 00 a 23 y minutos en el rango de 00 a 59 durante el ajuste
- ** - Probar que la hora avanza correctamente en un minuto cada vez que se simula un tick de tiempo
- ** - Probar que la hora transiciona correctamente de 23:59 a 00:00
- ** - Probar que el reloj ingresa al modo de ajuste de hora al recibir la señal de inicio de ajuste (señal de "F1" por más de 3 segundos)
- ** - Probar que, en modo de ajuste, se puede incrementar el valor de los minutos mediante la señal de "F4"
- ** - Probar que, en modo de ajuste, se puede disminuir el valor de los minutos mediante la señal de "F3"
- ** - Probar que el incremento  de minutos realizan un ciclo al alcanzar el valor máximo (59 a 00)
- ** - Probar que el decremento de minutos realizan un ciclo al alcanzar el valor mínimo (00 a 59)
- ** - Probar que, al confirmar la configuración de los minutos (señal de "Aceptar"), el ajuste procede a la configuración de la hora
- ** - Probar que el incremento de horas realizan un ciclo al alcanzar el valor máximo (23 a 00) 
- ** - Probar que el decremento de horas realizan un ciclo al alcanzar el valor mínimo (00 a 23) 
- ** - Probar que los cambios pendientes en el ajuste de hora se descartan si no hay interacción de usuario durante un período definido
- ** - Probar que los cambios pendientes se descartan si se recibe la señal de "Cancelar"
- ** - Probar que se puede definir una alarma para una hora y minutos específicos
- ** - Probar que la definición de alarma solo acepta el formato de 24 horas
- ** - Probar que se pueden definir alarmas hasta el límite máximo soportado por el sistema
- ** - Probar que se rechaza la definición de alarmas adicionales si se supera el límite máximo
- ** - Probar que se puede eliminar una alarma existente
- ** - Probar que la alarma se puede habilitar
- ** - Probar que la alarma se puede inhabilitar
- ** - Probar que la alarma se activa mediante la señal de "Aceptar" en modo normal del reloj
- ** - Probar que la alarma se desactiva mediante la señal de "Cancelar" en modo normal del reloj
- ** - Probar que la alarma se activa precisamente a la hora y minuto definidos
- ** - Probar que la alarma no se activa si está inhabilitada
- ** - Probar que si hay múltiples alarmas configuradas para el mismo minuto, todas se activan
- ** - Probar que una alarma de un solo uso se activa una única vez
- ** - Probar que cuando la alarma se activa, una señal de "Aceptar" la pospone por cinco minutos
- ** - Probar que cuando la alarma se activa, una señal de "Cancelar" la silencia hasta el día siguiente a la hora programada
- ** - Probar que el reloj ingresa al modo de ajuste de la alarma al recibir la señal de inicio de ajuste (señal de "F2" por más de 3 segundos)
- ** - Probar que el ajuste de la hora de la alarma sigue el mismo comportamiento lógico que el ajuste de la hora del reloj
+ ** - 1) Probar que el reloj, al iniciar, se encuentra en un estado inválido
+ ** - 2) Probar que el reloj se inicializa internamente en 00:00
+ ** - 3) Probar función ClockGetTime() con NULL como argumento "clock" (La hora debe ser 00:00)
+ ** - 4) Probar que se puede establecer la hora a un valor válido
+ ** - 5) Probar que se comprueba que la hora ingresada esté entre 00 y 23
+ ** - 6) Probar que se comprueba que los minutos ingresados estén entre 00 y 59
+ ** - 7) Probar que se comprueba que los segundos ingresados estén entre 00 y 59
+ ** - 8) Probar que puedo setear un valor válido, leer la hora seteada y comprobar que es válida
+ ** - 9) Probar que la hora avanza correctamente en un segundo cada vez que se simula un tick de tiempo
+ ** - 10) Probar que la hora avanza correctamente a una frecuencia diferente
+ ** - 11) Probar que los segundos pasan de 59 a 00 y los minutos avanzan en 1
+ ** - 12) Probar que los minutos pasan de 59 a 00 y la hora avanza en 1
+ ** - 13) Probar que la hora transiciona correctamente de 23:59:59 a 00:00:00
+ ** -  Probar que el reloj ingresa al modo de ajuste de hora al recibir la señal de inicio de ajuste (señal de "F1" por más de 3 segundos)
+ ** -  Probar que, en modo de ajuste, se puede incrementar el valor de los minutos mediante la señal de "F4"
+ ** -  Probar que, en modo de ajuste, se puede disminuir el valor de los minutos mediante la señal de "F3"
+ ** -  Probar que el incremento  de minutos realizan un ciclo al alcanzar el valor máximo (59 a 00)
+ ** -  Probar que el decremento de minutos realizan un ciclo al alcanzar el valor mínimo (00 a 59)
+ ** -  Probar que, al confirmar la configuración de los minutos (señal de "Aceptar"), el ajuste procede a la configuración de la hora
+ ** -  Probar que el incremento de horas realizan un ciclo al alcanzar el valor máximo (23 a 00) 
+ ** -  Probar que el decremento de horas realizan un ciclo al alcanzar el valor mínimo (00 a 23) 
+ ** -  Probar que los cambios pendientes en el ajuste de hora se descartan si no hay interacción de usuario durante un período definido
+ ** -  Probar que los cambios pendientes se descartan si se recibe la señal de "Cancelar"
+ ** -  Probar que se puede definir una alarma para una hora y minutos específicos
+ ** -  Probar que la definición de alarma solo acepta el formato de 24 horas
+ ** -  Probar que se pueden definir alarmas hasta el límite máximo soportado por el sistema
+ ** -  Probar que se rechaza la definición de alarmas adicionales si se supera el límite máximo
+ ** -  Probar que se puede eliminar una alarma existente
+ ** -  Probar que la alarma se puede habilitar
+ ** -  Probar que la alarma se puede inhabilitar
+ ** -  Probar que la alarma se activa mediante la señal de "Aceptar" en modo normal del reloj
+ ** -  Probar que la alarma se desactiva mediante la señal de "Cancelar" en modo normal del reloj
+ ** -  Probar que la alarma se activa precisamente a la hora y minuto definidos
+ ** -  Probar que la alarma no se activa si está inhabilitada
+ ** -  Probar que si hay múltiples alarmas configuradas para el mismo minuto, todas se activan
+ ** -  Probar que una alarma de un solo uso se activa una única vez
+ ** -  Probar que cuando la alarma se activa, una señal de "Aceptar" la pospone por cinco minutos
+ ** -  Probar que cuando la alarma se activa, una señal de "Cancelar" la silencia hasta el día siguiente a la hora programada
+ ** -  Probar que el reloj ingresa al modo de ajuste de la alarma al recibir la señal de inicio de ajuste (señal de "F2" por más de 3 segundos)
+ ** -  Probar que el ajuste de la hora de la alarma sigue el mismo comportamiento lógico que el ajuste de la hora del reloj
  **/
 
 /* === Headers files inclusions ==================================================================================== */
 
 #include "unity.h"
+#include "clock.h"
 
 /* === Macros definitions ========================================================================================== */
+
+#define CLOCK_TICKS_PER_SECOND 5
 
 /* === Private data type declarations ============================================================================== */
 
@@ -79,6 +87,142 @@ SPDX-License-Identifier: MIT
 
 /* === Private function definitions ================================================================================ */
 
+/**
+ * @brief Función que permite simular que pasaron N segundos
+ * 
+ * @param clock Puntero a la estructura con los datos del reloj
+ * @param seconds Cantidad (N) de segundos que se quieren simular
+ */
+void SimulateNSeconds(clock_t clock, uint8_t seconds){
+    for (uint8_t i = 0; i < CLOCK_TICKS_PER_SECOND * seconds; i++){
+        ClockTick(clock);
+    }
+}
+
 /* === Public function definitions ================================================================================= */
 
+// 1) Probar que el reloj, al iniciar, se encuentra en un estado inválido
+void test_set_up_clock_is_invalid(void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+    clock_time_t current_time;
+
+    TEST_ASSERT_FALSE(ClockGetTime(clock, &current_time));
+}
+
+// 2) Probar que el reloj se inicializa internamente en 00:00 
+void test_set_up_time_is_00_00 (void){   
+    clock_time_t current_time = {
+        .bcd = {1,2,3,4,5,6},
+    };
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    ClockGetTime(clock, &current_time);
+    TEST_ASSERT_EACH_EQUAL_UINT8 (0, current_time.bcd, 6);
+}
+
+// 3) Probar función ClockGetTime() con NULL como argumento "clock" 
+void test_ClockGetTime_with_argument_NULL(void){
+    clock_t clock = NULL;
+    clock_time_t current_time = {
+        .bcd = {1,2,3,4,5,6},
+    };
+
+    TEST_ASSERT_FALSE (ClockGetTime(clock, &current_time));
+}
+
+// 4) Probar que se puede establecer la hora a un valor válido
+void test_time_can_be_set_in_valid_value(void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t set_time = {
+        .time.hours = {1,4},
+        .time.minutes = {3,0}, 
+        .time.seconds = {1,5},              
+    };
+
+    TEST_ASSERT_TRUE(ClockSetTime(clock, &set_time));   
+}
+
+// 5) Probar que se comprueba que la hora ingresada esté entre 00 y 23
+void test_setted_hour_is_a_valid_hour(void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t new_time = {
+        .time.hours = {2,4},
+        .time.minutes = {3,0}, 
+        .time.seconds = {1,5}, 
+    };
+
+    TEST_ASSERT_FALSE(ClockSetTime(clock, &new_time));
+}
+
+// 6) Probar que se comprueba que los minutos ingresados estén entre 00 y 59
+void test_setted_minutes_is_a_valid_value_for_minutes(void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t new_time = {
+        .time.hours = {2,1},
+        .time.minutes = {6,0},    
+        .time.seconds = {1,5},    
+    };
+
+    TEST_ASSERT_FALSE(ClockSetTime(clock, &new_time));
+}
+
+// 7) Probar que se comprueba que los segundos ingresados estén entre 00 y 59
+void test_setted_seconds_is_a_valid_value_for_seconds(void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t new_time = {
+        .time.hours = {2,1},
+        .time.minutes = {3,0},
+        .time.seconds = {6,0},        
+    };
+
+    TEST_ASSERT_FALSE(ClockSetTime(clock, &new_time));
+}
+
+// 8) Probar que puedo setear un valor válido, leer la hora seteada y comprobar que es válida
+void test_set_valid_time_and_read_it (void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+
+    static const clock_time_t new_time = {
+        .time.hours = {2,1},
+        .time.minutes = {3,0},
+        .time.seconds = {3,0},
+    };
+
+    clock_time_t current_time;
+
+    TEST_ASSERT_TRUE(ClockSetTime(clock, &new_time));
+    TEST_ASSERT_TRUE(ClockGetTime(clock, &current_time));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY (current_time.bcd, new_time.bcd, 6);
+    
+}
+
+// 9) Probar que la hora avanza correctamente en un segundo cada vez que se simula un tick de tiempo
+void test_clock_advance_one_second(void){
+    clock_t clock = ClockCreate(CLOCK_TICKS_PER_SECOND);
+    
+    static const clock_time_t current_time = {
+        .time.hours = {1,4},
+        .time.minutes = {3,0},
+        .time.seconds = {1,5},
+    };
+
+    static const clock_time_t expected_time = {
+        .time.hours = {1,4},
+        .time.minutes = {3,0},
+        .time.seconds = {1,6},
+    };
+
+    clock_time_t new_time;
+
+    ClockSetTime(clock, &current_time);
+
+    SimulateNSeconds(clock, 1);
+    ClockGetTime(clock, &new_time);
+
+    TEST_ASSERT_EQUAL_UINT8_ARRAY (expected_time.bcd, new_time.bcd, 6);
+}
 /* === End of documentation ======================================================================================== */

@@ -28,6 +28,9 @@ SPDX-License-Identifier: MIT
 
 /* === Headers files inclusions ==================================================================================== */
 
+#include <stdbool.h>
+#include <stdint.h>
+
 /* === Header for C++ compatibility ================================================================================ */
 
 #ifdef __cplusplus
@@ -38,9 +41,56 @@ extern "C" {
 
 /* === Public data type declarations =============================================================================== */
 
+//! Estructura de datos que representa la hora de dos posibles formas: Como un struct y como un arreglo
+typedef union {
+    struct {
+        uint8_t hours[2];
+        uint8_t minutes[2];
+        uint8_t seconds[2];
+    } time;
+    uint8_t bcd[6];
+} clock_time_t;
+
+//! Estructura de datos que representa el Reloj
+typedef struct clock_s* clock_t;
+
 /* === Public variable declarations ================================================================================ */
 
 /* === Public function declarations ================================================================================ */
+
+/**
+ * @brief Función que permite crear al onejto Reloj
+ *
+ * @return clock_t Puntero a la estructura con los datos del reloj
+ */
+clock_t ClockCreate(uint16_t ticks_per_second);
+
+/**
+ * @brief Función que permite obtener la hora actual del reloj
+ *
+ * @param clock Puntero con los datos del reloj
+ * @param result Puntero a la estructura con la hora actual del reloj
+ * @return true Si la hora actual es válida
+ * @return false Si la hora actual es inválida
+ */
+bool ClockGetTime(clock_t clock, clock_time_t* result);
+
+/**
+ * @brief Función que permite poner el reloj en una determinada hora
+ *
+ * @param clock Puntero a la estructura con los datos del reloj
+ * @param time_set Puntero a la estructura con la hora, minutos y segundos que se desean setear
+ * @return true Si la hora seteada es válida
+ * @return false Si la hora seteada es inválida
+ */
+bool ClockSetTime(clock_t clock, const clock_time_t* time_set);
+
+/**
+ * @brief Función de Tick para el Reloj
+ *
+ * @param clock Puntero a la estructura con los datos del Reloj
+ */
+void ClockTick(clock_t clock);
 
 /* === End of conditional blocks =================================================================================== */
 
