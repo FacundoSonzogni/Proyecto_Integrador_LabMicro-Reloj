@@ -43,6 +43,10 @@ struct clock_s {
     bool activated_alarm;
     bool alarm_is_ringing;
     bool ringig_is_enabled;
+    bool snoozed_alarm;
+    uint16_t snooze_seconds;
+    uint16_t seconds_count;
+    clock_time_t snoozed_alarm_time;
 };
 
 /* === Private function declarations =============================================================================== */
@@ -61,7 +65,7 @@ static bool CheckTimeIsValid(const clock_time_t *time);
  * 
  * @param clock Puntero a la estructura con los datos del Reloj
  */
-static void ClockTickIncrement(clock_t clock);
+static void ClockTickIncrement(clock_time_t *current_time);
 
 /**
  * @brief Función interna que incrementa los minutos en 1 unidad
@@ -122,38 +126,38 @@ static bool CheckTimeIsValid(const clock_time_t *time){
     return result;
 }
 
-static void ClockTickIncrement(clock_t self){
+static void ClockTickIncrement(clock_time_t *current_time){
     // Incremento de segundos
-    if (self->current_time.time.seconds[1] < 9) {
-        self->current_time.time.seconds[1]++;
+    if (current_time->time.seconds[1] < 9) {
+        current_time->time.seconds[1]++;
     } else {
-        self->current_time.time.seconds[1] = 0;
-        if (self->current_time.time.seconds[0] < 5) {
-            self->current_time.time.seconds[0]++;
+       current_time->time.seconds[1] = 0;
+        if (current_time->time.seconds[0] < 5) {
+            current_time->time.seconds[0]++;
         } else {
-            self->current_time.time.seconds[0] = 0;
+            current_time->time.seconds[0] = 0;
 
             // Incremento de minutos
-            if (self->current_time.time.minutes[1] < 9) {
-                self->current_time.time.minutes[1]++;
+            if (current_time->time.minutes[1] < 9) {
+                current_time->time.minutes[1]++;
             } else {
-                self->current_time.time.minutes[1] = 0;
-                if (self->current_time.time.minutes[0] < 5) {
-                    self->current_time.time.minutes[0]++;
+                current_time->time.minutes[1] = 0;
+                if (current_time->time.minutes[0] < 5) {
+                    current_time->time.minutes[0]++;
                 } else {
-                    self->current_time.time.minutes[0] = 0;
+                    current_time->time.minutes[0] = 0;
 
                     // Incremento de horas
-                    if (self->current_time.time.hours[1] < 9) {
-                        self->current_time.time.hours[1]++;
+                    if (current_time->time.hours[1] < 9) {
+                        current_time->time.hours[1]++;
                     } else {
-                        self->current_time.time.hours[1] = 0;
-                        self->current_time.time.hours[0]++;
+                        current_time->time.hours[1] = 0;
+                        current_time->time.hours[0]++;
                     }
 
-                    if (self->current_time.time.hours[0] == 2 && self->current_time.time.hours[1] == 4) {
+                    if (current_time->time.hours[0] == 2 && current_time->time.hours[1] == 4) {
                         // Pasó de 23:59:59 a 00:00:00
-                        memset(&(self->current_time), 0, sizeof(clock_time_t));
+                        memset(current_time, 0, sizeof(clock_time_t));
                     }
                 }
             }
@@ -227,7 +231,7 @@ static void DecrementHours(clock_time_t *current_time){
 
 /* === Public function definitions ================================================================================= */
 
-clock_t ClockCreate(uint16_t ticks_per_second){
+clock_t ClockCreate(uint16_t ticks_per_second, uint16_t snooze_seconds){
 
     clock_t self = malloc(sizeof(struct clock_s));
     if(self != NULL){
@@ -239,6 +243,9 @@ clock_t ClockCreate(uint16_t ticks_per_second){
         self->activated_alarm = false;
         self->alarm_is_ringing = false;
         self->ringig_is_enabled = true;
+        self->snoozed_alarm = false;
+        self->seconds_count = 0;
+        self->snooze_seconds = snooze_seconds;
     }
     return self;
 }
@@ -289,16 +296,26 @@ void ClockTick(clock_t self){
         if(self->current_clock_tick == self->ticks_per_second){
             self->current_clock_tick = 0;
 
-            if(self->ringig_is_enabled){
-                if(memcmp(&(self->current_time), &(self->setted_alarm_time), sizeof(clock_time_t))){
-                    ClockRingAlarm(self);
+            if(self->snoozed_alarm == false){
+                if(self->ringig_is_enabled){
+                    if(memcmp(&(self->current_time.bcd), &(self->setted_alarm_time.bcd), sizeof(clock_time_t))){
+                        ClockRingAlarm(self);
+                    }
+                }else{
+                    self->alarm_is_ringing = false;
                 }
-            }else{
-                self->alarm_is_ringing = false;
-            }
-            
 
-            ClockTickIncrement(self);
+                memcpy(&(self->snoozed_alarm_time.bcd), &(self->setted_alarm_time.bcd), sizeof(clock_time_t));
+
+            }else{
+                if(memcmp(&(self->current_time.bcd), &(self->snoozed_alarm_time.bcd), sizeof(clock_time_t))){
+                    self->ringig_is_enabled = true;
+                    self->alarm_is_ringing = true;
+                    self->snoozed_alarm = false;
+                }
+            }
+
+            ClockTickIncrement(&(self->current_time));
             
         }
     }        
@@ -339,7 +356,8 @@ bool ClockSetAlarm(clock_t self, const clock_time_t *time_set){
         result = CheckTimeIsValid(time_set);
     
         if(result == true){
-            memcpy(&(self->setted_alarm_time), time_set, sizeof(clock_time_t));
+            memcpy(&(self->setted_alarm_time.bcd), time_set, sizeof(clock_time_t));
+            memcpy(&(self->snoozed_alarm_time.bcd), &(self->setted_alarm_time.bcd), sizeof(clock_time_t));
             self->activated_alarm = true;
         }
 
@@ -428,5 +446,23 @@ void ClockEnableRinging(clock_t self){
 
 void ClockDisableRingig(clock_t self){
     self->ringig_is_enabled = false;
+}
+
+void ClockSnoozeAlarm(clock_t self){
+    for(uint16_t i=0; i < self->snooze_seconds; i++){
+        ClockTickIncrement(&(self->snoozed_alarm_time));
+    }
+
+    self->snoozed_alarm = true;
+    self->ringig_is_enabled = false;
+    self->alarm_is_ringing = false;
+}
+
+void ClockCancelAlarm(clock_t self){
+    memcpy(&(self->snoozed_alarm_time.bcd), &(self->setted_alarm_time.bcd), sizeof(clock_time_t));
+
+    self->snoozed_alarm = true;
+    self->ringig_is_enabled = false;
+    self->alarm_is_ringing = false;
 }
 /* === End of documentation ======================================================================================== */

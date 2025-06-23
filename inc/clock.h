@@ -63,7 +63,7 @@ typedef struct clock_s* clock_t;
  *
  * @return clock_t Puntero a la estructura con los datos del reloj
  */
-clock_t ClockCreate(uint16_t ticks_per_second);
+clock_t ClockCreate(uint16_t ticks_per_second, uint16_t snooze_seconds);
 
 /**
  * @brief Función que permite obtener la hora actual del reloj
@@ -215,6 +215,20 @@ void ClockEnableRinging(clock_t clock);
  * @param clock Puntero a la estructura con los datos del Reloj
  */
 void ClockDisableRingig(clock_t clock);
+
+/**
+ * @brief Función que permite posponer una alarma un determinado tiempo
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ */
+void ClockSnoozeAlarm(clock_t clock);
+
+/**
+ * @brief Función que permite apagar el sonido de la alarma hasta el otro día
+ * 
+ * @param clock Puntero a la estructura con los datos del Reloj
+ */
+void ClockCancelAlarm(clock_t clock);
 
 /* === End of conditional blocks =================================================================================== */
 
