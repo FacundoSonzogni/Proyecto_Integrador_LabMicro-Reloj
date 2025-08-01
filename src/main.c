@@ -35,71 +35,187 @@
 /**
  * @file main.c
  * @brief Código Fuente principal del proyecto (Por ahora son solo pruebas)
- * 
+ *
  */
 /* === Headers files inclusions =============================================================== */
 
 #include "bsp.h"
+#include "chip.h"
+#include "clock.h"
+#include <stdbool.h>
 
 /* === Macros definitions ====================================================================== */
 
 /* === Private data type declarations ========================================================== */
 
+//! Tipo de dato que representa el estado del reloj
+typedef enum clock_state_e{
+    STATE_INVALID_TIME,             //!< Indica que la hora es inválida
+    STATE_SHOWING_CURRENT_TIME,     //!< Indica que se está mostrando la hora actual
+    STATE_ADJUSTING_TIME_MINUTES,   //!< Indica que se están ajustando los minutos 
+    STATE_ADJUSTING_TIME_HOURS,     //!< Indica que se están ajustando las horas 
+    STATE_ADJUSTING_ALARM_MINUTES,  //!< Indica que se están ajustando los minutos de la alarma
+    STATE_ADJUSTING_ALARM_HOURS,    //!< Indica que se están ajustando las horas de la alarma 
+} clock_state_t;
+
 /* === Private variable declarations =========================================================== */
 
 /* === Private function declarations =========================================================== */
 
+/**
+ * @brief Función que permite configurar el Systick
+ *
+ */
+static void SystickConfig(void);
+
+/**
+ * @brief Función que permite simular el encendido del sonido de la alarma
+ *
+ * @param clock Puntero a la estructura con los datos del reloj
+ */
+static void ClockAlarmTurnOn(clock_t clock);
+
+/**
+ * @brief Función que permite simular el apagado del sonido de la alarma
+ *
+ * @param clock Puntero a la estructura con los datos del reloj
+ */
+static void ClockAlarmTurnOff(clock_t clock);
+
+
 /* === Public variable definitions ============================================================= */
+
+//! Variable global que representa a la placa
+static const struct board_s * board = NULL;
+
+//! Variable global que representa al reloj interno
+static clock_t clock = NULL;
+
+//! Variable global que representa el estado actual del reloj despertador
+static clock_state_t current_state = STATE_SHOWING_CURRENT_TIME;
+
+//! Variable global que indica cuando se está en estado de ajustar hora
+static volatile bool enter_adjusting_mode = false;
+
+//! Estructura constante que representa el driver del reloj con las funciones de callback
+static const struct clock_alarm_driver_s driver = {
+    .ClockAlarmTurnOn = ClockAlarmTurnOn,
+    .ClockAlarmTurnOff = ClockAlarmTurnOff,
+};
+
 
 /* === Private variable definitions ============================================================ */
 
 /* === Private function implementation ========================================================= */
 
-/* === Public function implementation ========================================================= */
+static void SystickConfig(void) {
+    // Genera un interrupción cada 1 ms y se ejcuta el código de Systick_Handler (1 Tick = 1 ms)
+    SystemCoreClockUpdate();
+    SysTick_Config((SystemCoreClock / 1000) - 1);
 
+    NVIC_SetPriority(SysTick_IRQn, (1 << __NVIC_PRIO_BITS) - 1);
+}
+
+static void ClockAlarmTurnOn(clock_t self) {
+    (void)self;
+}
+
+static void ClockAlarmTurnOff(clock_t self) {
+    (void)self;
+}
+
+
+/* === Public function implementation ========================================================== */
+
+//! Función que se ejecuta cada 1 ms (Rutina de servicio de interrupción del Systick)
+void SysTick_Handler(void) {
+
+    static int ticks_F1_was_pressed = 0;
+
+    if (board != NULL) {
+        ScreenRefresh(board->screen);
+    }
+
+    if (clock != NULL) {
+        ClockTick(clock);
+    }
+
+    // Controla si el botón F1 se mantuvo pulsado por 3 segundos
+    if(DigitalInputGetIsActive(board->key_F1)){
+        ticks_F1_was_pressed ++;
+
+        if(ticks_F1_was_pressed == 3000){ 
+            enter_adjusting_mode = true;
+        }
+    }else{
+        ticks_F1_was_pressed = 0;
+    }
+}
+
+//! Programa principal con la aplicación deseada 
 int main(void) {
 
-    int divisor = 0;
-    uint8_t value[4] = {1, 2, 3, 4};
+   SystickConfig();
 
-    board_t board = BoardCreate();
-    ScreenWriteBCD(board->screen, value, 4);
+   clock_time_t current_time;
+   //clock_time_t adjusted_time;
+   bool valid_time;
 
-    ScreenSetDotState(board->screen, 0, true);
-    ScreenSetDotState(board->screen, 1, true);
-    ScreenSetDotState(board->screen, 2, true);
-    ScreenSetDotState(board->screen, 3, true);
+   board = BoardCreate();
+   clock = ClockCreate(1000, 300, &driver);
 
-    ScreenFlashDigits(board->screen, 1, 2, 50);
+   while(true){
 
-    ScreenFlashDot(board->screen, 3, 25);
-    ScreenFlashDot(board->screen, 1, 50);
+        switch (current_state){
 
-    while (true) {
+            case STATE_INVALID_TIME:
+                ScreenWriteBCD(board->screen, current_time.bcd, 4); 
+                ScreenFlashDigits(board->screen, 0, 3, 125); 
 
-        // Lógica para el control del LED RGB de Alarma (Rojo)
+                ScreenSetDotState(board->screen, 2, true); 
+                ScreenFlashDot(board->screen, 2, 125);  
 
-        if (DigitalInputGetIsActive(board->key_accept)) {
-            DigitalOutputActivate(board->led_alarm);
+                if(enter_adjusting_mode){
+                    current_state = STATE_ADJUSTING_TIME_MINUTES;
+                }
+
+            break;
+
+            case STATE_SHOWING_CURRENT_TIME:
+                valid_time = ClockGetTime(clock, &current_time);
+
+                if(valid_time){
+                    ScreenWriteBCD(board->screen, current_time.bcd, 4);
+
+                    ScreenSetDotState(board->screen, 2, true); 
+                    ScreenFlashDot(board->screen, 2, 125);  
+                }else{
+                    current_state = STATE_INVALID_TIME;
+                }
+                
+            break;
+
+            case STATE_ADJUSTING_TIME_MINUTES:
+                DigitalOutputToggle(board->led_alarm);
+                //Acordarse que de aca debe pasar a ajustar horas yq ue una vez ajustada la hora debe pasarse a showing hour
+                // y poner enter_adjusting_hour en false
+            break;
+
+            case STATE_ADJUSTING_TIME_HOURS:
+                //code
+            break;
+
+            case STATE_ADJUSTING_ALARM_MINUTES:
+                //code
+            break;
+
+            case STATE_ADJUSTING_ALARM_HOURS:
+                //code
+            break;
         }
-        if (DigitalInputGetIsActive(board->key_cancel)) {
-            DigitalOutputDeactivate(board->led_alarm);
-        }
+       
 
-        // Lógica para el control del display
-
-        divisor++;
-        if (divisor == 5) {
-            divisor = 0;
-        }
-
-        ScreenRefresh(board->screen);
-
-        for (int delay = 0; delay < 25000; delay++) {
-            __asm("NOP");
-        }
-
-    }
+   }
 }
 
 /* === End of documentation ==================================================================== */

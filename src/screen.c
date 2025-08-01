@@ -176,10 +176,17 @@ int ScreenFlashDigits(screen_t self, uint8_t from, uint8_t to, uint16_t half_per
     }else if(self == NULL){
         result = -1;
     }else{
-        self->flashing_from = from;
-        self->flashing_to = to;
-        self->flashing_period = 2 * half_period;
-        self->flashing_count = 0;
+
+        uint16_t new_period = 2 * half_period;
+
+        // Solo modificar si cambió la configuración
+        if ((self->flashing_from != from) || (self->flashing_to != to) || (self->flashing_period != new_period)) {
+
+            self->flashing_from = from;
+            self->flashing_to = to;
+            self->flashing_period = new_period;
+            self->flashing_count = 0;
+        }
     }
 
     return result;
@@ -209,8 +216,15 @@ int ScreenFlashDot(screen_t self, uint8_t digit, uint16_t half_period){
     }else if(self == NULL){
         result = -1;
     }else{
-        self->flashing_dot_period[(self->digits - 1) - digit] = 2 * half_period;
-        self->flashing_dot_count[(self->digits - 1) - digit] = 0;
+
+        uint8_t i = (self->digits - 1) - digit;
+        uint16_t new_period = 2 * half_period;
+
+        // Solo cambiar si es distinto para evitar reiniciar el parpadeo
+        if (self->flashing_dot_period[i] != new_period) {
+            self->flashing_dot_period[i] = new_period;
+            self->flashing_dot_count[i] = 0;
+        }
     }
 
     return result;
