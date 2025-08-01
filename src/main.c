@@ -146,8 +146,7 @@ static void ClockAlarmTurnOn(clock_t self) {
 }
 
 static void ClockAlarmTurnOff(clock_t self) {
-    //DigitalOutputDeactivate(board->led_alarm);
-    (void)self;
+    DigitalOutputDeactivate(board->led_alarm);
 }
 
 /* === Public function implementation ========================================================== */
@@ -250,6 +249,7 @@ void SysTick_Handler(void) {
         ticks_key_cancel_was_pressed = 0;
     }
 
+    // Controla si han pasado 30 segundos sin que se presione ningún botón
     if (current_state == STATE_ADJUSTING_TIME_MINUTES || current_state == STATE_ADJUSTING_TIME_HOURS
         || current_state == STATE_ADJUSTING_ALARM_MINUTES || current_state == STATE_ADJUSTING_ALARM_HOURS) {
 
@@ -324,6 +324,18 @@ int main(void) {
                     adjusted_alarm_time = alarm_time;
                     exit_adjusting_alarm = false;
                     current_state = STATE_ADJUSTING_ALARM_MINUTES;
+                }
+
+                if(key_accept_was_pressed){
+                    key_accept_was_pressed = false;
+                    alarm_is_activated = true;
+                    ClockSetAlarm(clock, &alarm_time);
+                }
+
+                if(key_cancel_was_pressed){
+                    key_cancel_was_pressed = false;
+                    alarm_is_activated = false;
+                    ClockDisableAlarm(clock);
                 }
 
                 if(ClockGetIfAlarmIsActivated(clock)){
@@ -476,7 +488,7 @@ int main(void) {
                 }
 
                 break;
-                //CORREGIR: SI SETEO UNA ALARMA Y DESPUES ENTRO EN MODO AJUSTAR ALARMA Y EN ALGUN MOMENTO PONGO CANCELAR, LA ALARMA QUE YA ESTABA NO SE DEBE DESHABILITAR
+                
             case STATE_ADJUSTING_ALARM_HOURS:
                 ScreenFlashDigits(board->screen, 0, 1, 125);
 
