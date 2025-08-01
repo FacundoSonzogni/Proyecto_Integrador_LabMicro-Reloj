@@ -1009,7 +1009,7 @@ void test_alarm_rings_when_alarm_time_is_reached(void) {
     ClockSetTime(clock, &current_time);
     ClockSetAlarm(clock, &alarm_time);
 
-    SimulateNSeconds(clock, 10);
+    SimulateNSeconds(clock, 11);
     TEST_ASSERT_TRUE(ClockGetIfAlarmIsRinging(clock));
 }
 // 55) Probar que la alarma sigue sonando indefinidamente luego de haber alcanzado la hora deseada, si es que no se detiene
@@ -1076,7 +1076,7 @@ void test_alarm_can_stop_ringing_if_desired(void) {
     ClockSetTime(clock, &current_time);
     ClockSetAlarm(clock, &alarm_time);
 
-    SimulateNSeconds(clock, 10);
+    SimulateNSeconds(clock, 11);
     TEST_ASSERT_TRUE(ClockGetIfAlarmIsRinging(clock));
 
     ClockDisableRingig(clock);

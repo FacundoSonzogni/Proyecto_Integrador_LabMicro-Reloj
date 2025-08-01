@@ -292,7 +292,7 @@ void ClockTick(clock_t self) {
 
             if (self->snoozed_alarm == false) {
                 if (self->ringig_is_enabled) {
-                    if (memcmp(&(self->current_time.bcd), &(self->setted_alarm_time.bcd), sizeof(clock_time_t))) {
+                    if (memcmp(&(self->current_time.bcd), &(self->setted_alarm_time.bcd), sizeof(clock_time_t)) == 0) {
                         ClockRingAlarm(self);
                     }
                 } else {
@@ -353,6 +353,7 @@ bool ClockSetAlarm(clock_t self, const clock_time_t* time_set) {
             memcpy(&(self->setted_alarm_time.bcd), time_set, sizeof(clock_time_t));
             memcpy(&(self->snoozed_alarm_time.bcd), &(self->setted_alarm_time.bcd), sizeof(clock_time_t));
             self->activated_alarm = true;
+            self->ringig_is_enabled = true;
         }
 
         return result;
@@ -384,6 +385,7 @@ bool ClockGetIfAlarmIsActivated(clock_t self) {
 
 void ClockDisableAlarm(clock_t self) {
     self->activated_alarm = false;
+    self->ringig_is_enabled = false;
 }
 
 void ClockIncrementAlarmMinutes(clock_t self) {

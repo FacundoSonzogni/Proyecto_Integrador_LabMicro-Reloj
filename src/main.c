@@ -115,8 +115,11 @@ static volatile bool key_cancel_was_pressed = false;
 //! Variable global que detecta que no se pulsó ningún botón por 30 segundos
 static volatile bool no_button_was_pressed_for_30secs = false;
 
-
+//! Variable global que indica que la alarma está activada (no que está sonando)
 static volatile bool alarm_is_activated = false;
+
+//! Variable global que detecta que se salió del modo ajuste de alarma
+static volatile bool exit_adjusting_alarm = false;
 
 //! Estructura constante que representa el driver del reloj con las funciones de callback
 static const struct clock_alarm_driver_s driver = {
@@ -137,10 +140,13 @@ static void SystickConfig(void) {
 }
 
 static void ClockAlarmTurnOn(clock_t self) {
-    (void)self;
+    if(exit_adjusting_alarm){
+        DigitalOutputActivate(board->led_alarm);
+    }
 }
 
 static void ClockAlarmTurnOff(clock_t self) {
+    //DigitalOutputDeactivate(board->led_alarm);
     (void)self;
 }
 
@@ -276,8 +282,8 @@ int main(void) {
 
     board = BoardCreate();
     clock = ClockCreate(1000, 300, &driver);
-                    // SACAR TODOS LOS LED_ALARM QUE NO SEAN PARA LA ALARMA. SON SOLO PRUEBAS!!!!!
-    while (true) { // CORREGIR: PARPADEO RARO EN INVALID STATE CUANDO SE APRIETA F1!!!!!
+                    
+    while (true) { // CORREGIR: PARPADEO RARO EN ALGUNOS MOMENTOS
                    // ACORDARSE DE PONER EN FALSE ALARM_IS_ACTIVATED CUANDO SE DESACTIVE
 
         switch (current_state) {
@@ -316,6 +322,7 @@ int main(void) {
 
                 if (enter_adjusting_alarm_mode) {
                     adjusted_alarm_time = alarm_time;
+                    exit_adjusting_alarm = false;
                     current_state = STATE_ADJUSTING_ALARM_MINUTES;
                 }
 
@@ -338,7 +345,11 @@ int main(void) {
                     key_cancel_was_pressed = false;
                     no_button_was_pressed_for_30secs = false;
                     enter_adjusting_mode = false;
-                    current_state = STATE_INVALID_TIME;
+                    if(valid_time){
+                        current_state = STATE_SHOWING_CURRENT_TIME;
+                    }else{
+                        current_state = STATE_INVALID_TIME;
+                    }
                 } else {
                     if (F4_was_pressed) {
                         F4_was_pressed = false;
@@ -377,7 +388,11 @@ int main(void) {
                     enter_adjusting_mode = false;
                     key_cancel_was_pressed = false;
                     no_button_was_pressed_for_30secs = false;
-                    current_state = STATE_INVALID_TIME;
+                    if(valid_time){
+                        current_state = STATE_SHOWING_CURRENT_TIME;
+                    }else{
+                        current_state = STATE_INVALID_TIME;
+                    }
                 } else {
                     if (F4_was_pressed) {
                         F4_was_pressed = false;
@@ -429,9 +444,11 @@ int main(void) {
                     key_cancel_was_pressed = false;
                     no_button_was_pressed_for_30secs = false;
                     current_state = STATE_SHOWING_CURRENT_TIME;
+                    exit_adjusting_alarm = true;
                 }else{
                     if (F4_was_pressed) {
                         F4_was_pressed = false;
+                        exit_adjusting_alarm = false;
                         ClockSetAlarm(clock, &adjusted_alarm_time);
                         ClockIncrementAlarmMinutes(clock);
                         ClockGetAlarm(clock, &adjusted_alarm_time);
@@ -442,6 +459,7 @@ int main(void) {
 
                     if (F3_was_pressed) {
                         F3_was_pressed = false;
+                        exit_adjusting_alarm = false;
                         ClockSetAlarm(clock, &adjusted_alarm_time);
                         ClockDecrementAlarmMinutes(clock);
                         ClockGetAlarm(clock, &adjusted_alarm_time);
@@ -453,6 +471,7 @@ int main(void) {
                     if (key_accept_was_pressed) {
                         key_accept_was_pressed = false;
                         current_state = STATE_ADJUSTING_ALARM_HOURS;
+                        exit_adjusting_alarm = false;
                     }
                 }
 
@@ -475,10 +494,12 @@ int main(void) {
                     enter_adjusting_alarm_mode = false;
                     key_cancel_was_pressed = false;
                     no_button_was_pressed_for_30secs = false;
+                    exit_adjusting_alarm = true;
                     current_state = STATE_SHOWING_CURRENT_TIME;
                 } else {
                     if (F4_was_pressed) {
                         F4_was_pressed = false;
+                        exit_adjusting_alarm = false;
                         ClockSetAlarm(clock, &adjusted_alarm_time);
                         ClockIncrementAlarmHours(clock);
                         ClockGetAlarm(clock, &adjusted_alarm_time);
@@ -489,6 +510,7 @@ int main(void) {
 
                     if (F3_was_pressed) {
                         F3_was_pressed = false;
+                        exit_adjusting_alarm = false;
                         ClockSetAlarm(clock, &adjusted_alarm_time);
                         ClockDecrementAlarmHours(clock);
                         ClockGetAlarm(clock, &adjusted_alarm_time);
@@ -503,6 +525,7 @@ int main(void) {
                         key_accept_was_pressed = false;
                         enter_adjusting_alarm_mode = false;
                         alarm_is_activated = true;
+                        exit_adjusting_alarm = true;
                         current_state = STATE_SHOWING_CURRENT_TIME;
                     }
                 }
