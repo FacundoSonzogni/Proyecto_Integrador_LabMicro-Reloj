@@ -60,7 +60,7 @@ typedef void (*clock_alarm_turn_on)(clock_t);
 //! Tipo de dato que representa una función que permite apagar la alarma
 typedef void (*clock_alarm_turn_of)(clock_t);
 
-/*! Estructura de datos que representa el driver del reloj con las funciones de callback para gestionar la alarma */
+//! Estructura de datos que representa el driver del reloj con las funciones de callback para gestionar la alarma 
 typedef struct clock_alarm_driver_s {
     clock_alarm_turn_on ClockAlarmTurnOn;  //!< Función que permite encender el sonido de la alarma
     clock_alarm_turn_of ClockAlarmTurnOff; //!< Función que permite apagar el sonido de la alarma

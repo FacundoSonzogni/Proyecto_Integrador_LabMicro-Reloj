@@ -65,12 +65,12 @@ digital_output_t DigitalOutputCreate(uint8_t gpio_port, uint8_t gpio_bit, bool a
         self->gpio_bit = gpio_bit;
         self->active_low = active_low;
 
-        if(active_low == true){
+        if (active_low == true) {
             Chip_GPIO_SetPinState(LPC_GPIO_PORT, gpio_port, gpio_bit, true);
-        }else{
+        } else {
             Chip_GPIO_SetPinState(LPC_GPIO_PORT, gpio_port, gpio_bit, false);
         }
-        
+
         Chip_GPIO_SetPinDIR(LPC_GPIO_PORT, gpio_port, gpio_bit, true);
     }
 
@@ -78,21 +78,19 @@ digital_output_t DigitalOutputCreate(uint8_t gpio_port, uint8_t gpio_bit, bool a
 }
 
 void DigitalOutputActivate(digital_output_t self) {
-    if(self->active_low == true){
+    if (self->active_low == true) {
         Chip_GPIO_SetPinState(LPC_GPIO_PORT, self->gpio_port, self->gpio_bit, false);
-    }else{
+    } else {
         Chip_GPIO_SetPinState(LPC_GPIO_PORT, self->gpio_port, self->gpio_bit, true);
     }
-    
 }
 
 void DigitalOutputDeactivate(digital_output_t self) {
-    if(self->active_low == true){
+    if (self->active_low == true) {
         Chip_GPIO_SetPinState(LPC_GPIO_PORT, self->gpio_port, self->gpio_bit, true);
-    }else{
+    } else {
         Chip_GPIO_SetPinState(LPC_GPIO_PORT, self->gpio_port, self->gpio_bit, false);
     }
-    
 }
 
 void DigitalOutputToggle(digital_output_t self) {

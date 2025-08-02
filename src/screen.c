@@ -49,7 +49,6 @@ struct screen_s {
     uint8_t flashing_dot_count[SCREEN_MAX_DIGITS];   //!< Cuenta la cantidad de ciclos que van pasando (si es que parpadean los puntos)
     uint16_t flashing_dot_period[SCREEN_MAX_DIGITS]; //!< Período del parpadeo de los puntos (Cantidad de ciclos totales entre que se enciende, se apaga y se vuelve a encender)
     screen_driver_t driver;                          //!< Driver de la pantalla con las funciones de callback
-    
 };
 
 /*! Arreglo constante de 10 elementos en los que cada elemnto representa los segmentos correspondientes a cada número del 0 al 9 */
@@ -89,12 +88,11 @@ screen_t ScreenCreate(uint8_t digits, screen_driver_t driver) {
         self->current_digit = 0;
         self->flashing_count = 0;
         self->flashing_period = 0;
-        
-        for(int i = 0; i < self->digits; i++){
+
+        for (int i = 0; i < self->digits; i++) {
             self->flashing_dot_count[i] = 0;
             self->flashing_dot_period[i] = 0;
         }
-        
     }
 
     return self;
@@ -102,7 +100,7 @@ screen_t ScreenCreate(uint8_t digits, screen_driver_t driver) {
 
 void ScreenWriteBCD(screen_t self, uint8_t value[], uint8_t size) {
 
-    for(int j = 0; j < self->digits; j++){
+    for (int j = 0; j < self->digits; j++) {
         self->memory_video[j] = self->memory_video[j] & SEGMENT_P_MASK;
     }
 
@@ -130,26 +128,25 @@ void ScreenRefresh(screen_t self) {
     segments = self->memory_video[self->current_digit];
 
     // Parpadeo de los números (segmentos)
-    if(self->flashing_period != 0){
-        if(self->current_digit == 0){
+    if (self->flashing_period != 0) {
+        if (self->current_digit == 0) {
             self->flashing_count = (self->flashing_count + 1) % (self->flashing_period);
         }
 
-        if(self->flashing_count < (self->flashing_period / 2)){
-            if(self->current_digit >= self->flashing_from){
-                if(self->current_digit <= self->flashing_to){
+        if (self->flashing_count < (self->flashing_period / 2)) {
+            if (self->current_digit >= self->flashing_from) {
+                if (self->current_digit <= self->flashing_to) {
                     segments = segments & SEGMENT_P_MASK;
                 }
             }
-            
         }
     }
 
-    //Parpadeo de los puntos
+    // Parpadeo de los puntos
     for (int i = 0; i < self->digits; i++) {
         if (self->flashing_dot_period[i] != 0) {
             if (self->current_digit == 0) {
-                if (self->flashing_dot_count[i] <  self->flashing_dot_period[i] - 1) {
+                if (self->flashing_dot_count[i] < self->flashing_dot_period[i] - 1) {
                     self->flashing_dot_count[i] = self->flashing_dot_count[i] + 1;
                 } else {
                     self->flashing_dot_count[i] = 0;
@@ -168,14 +165,14 @@ void ScreenRefresh(screen_t self) {
     self->driver->DigitTurnOn(self->current_digit);
 }
 
-int ScreenFlashDigits(screen_t self, uint8_t from, uint8_t to, uint16_t half_period){
+int ScreenFlashDigits(screen_t self, uint8_t from, uint8_t to, uint16_t half_period) {
     int result = 0;
 
-    if((from > to) || (from >= SCREEN_MAX_DIGITS) || (to >= SCREEN_MAX_DIGITS)){
+    if ((from > to) || (from >= SCREEN_MAX_DIGITS) || (to >= SCREEN_MAX_DIGITS)) {
         result = -1;
-    }else if(self == NULL){
+    } else if (self == NULL) {
         result = -1;
-    }else{
+    } else {
 
         uint16_t new_period = 2 * half_period;
 
@@ -192,30 +189,29 @@ int ScreenFlashDigits(screen_t self, uint8_t from, uint8_t to, uint16_t half_per
     return result;
 }
 
-void ScreenSetDotState(screen_t self, uint8_t digit, bool turn_on){
+void ScreenSetDotState(screen_t self, uint8_t digit, bool turn_on) {
 
-    if(digit >= self->digits ){
+    if (digit >= self->digits) {
         digit = (self->digits - 1);
-    }  
-    
-    if (self != NULL){
-        if(turn_on == true){
+    }
+
+    if (self != NULL) {
+        if (turn_on == true) {
             self->memory_video[(self->digits - 1) - digit] = self->memory_video[(self->digits - 1) - digit] | SEGMENT_P_MASK;
-        }else if(turn_on == false){
+        } else if (turn_on == false) {
             self->memory_video[(self->digits - 1) - digit] = self->memory_video[(self->digits - 1) - digit] & (~SEGMENT_P_MASK);
         }
     }
-
 }
 
-int ScreenFlashDot(screen_t self, uint8_t digit, uint16_t half_period){
+int ScreenFlashDot(screen_t self, uint8_t digit, uint16_t half_period) {
     int result = 0;
 
-    if(digit >= self->digits){
+    if (digit >= self->digits) {
         result = -1;
-    }else if(self == NULL){
+    } else if (self == NULL) {
         result = -1;
-    }else{
+    } else {
 
         uint8_t i = (self->digits - 1) - digit;
         uint16_t new_period = 2 * half_period;

@@ -43,14 +43,14 @@ extern "C" {
 
 //! Estructura de datos que representa a la placa de desarrollo
 typedef struct board_s {
-    digital_input_t key_F1;      //!< Tecla "F1" del Poncho (En el Reloj, sería la tecla para configurar la hora)
-    digital_input_t key_F2;      //!< Tecla "F2" del Poncho (En el Reloj, sería la tecla para configurar la alarma)
-    digital_input_t key_F3;      //!< Tecla "F3" del Poncho (En el Reloj, sería la tecla para decrementar el valor del display)
-    digital_input_t key_F4;      //!< Tecla "F4" del Poncho (En el Reloj, sería la tecla para incrementar el valor del display)
-    digital_input_t key_accept;  //!< Tecla "Aceptar" del Poncho
-    digital_input_t key_cancel;  //!< Tecla "Cancelar" del Poncho
-    digital_output_t led_alarm;  //!< Led RGB (se prende en rojo) del poncho (En el reloj, representaría la alarma)
-    screen_t screen;             //!< Pantalla formada por los displays 7 segmentos del pocnho
+    digital_input_t key_F1;     //!< Tecla "F1" del Poncho (En el Reloj, sería la tecla para configurar la hora)
+    digital_input_t key_F2;     //!< Tecla "F2" del Poncho (En el Reloj, sería la tecla para configurar la alarma)
+    digital_input_t key_F3;     //!< Tecla "F3" del Poncho (En el Reloj, sería la tecla para decrementar el valor del display)
+    digital_input_t key_F4;     //!< Tecla "F4" del Poncho (En el Reloj, sería la tecla para incrementar el valor del display)
+    digital_input_t key_accept; //!< Tecla "Aceptar" del Poncho
+    digital_input_t key_cancel; //!< Tecla "Cancelar" del Poncho
+    digital_output_t led_alarm; //!< Led RGB (se prende en rojo) del poncho (En el reloj, representaría la alarma)
+    screen_t screen;            //!< Pantalla formada por los displays 7 segmentos del pocnho
 } const* const board_t;
 
 /* === Public variable declarations ================================================================================ */

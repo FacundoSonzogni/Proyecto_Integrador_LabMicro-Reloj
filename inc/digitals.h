@@ -42,7 +42,7 @@ extern "C" {
 /* === Public data type declarations =============================================================================== */
 
 //! Tipo de dato que representa en cambio en el estado de un pin de entrada
-typedef enum digital_input_state_e{
+typedef enum digital_input_state_e {
     DIGITAL_INPUT_WAS_DEACTIVATED = -1, //!< Indica que la entrada se activó
     DIGITAL_INPUT_NO_CHANGE = 0,        //!< Indica que la entrada no cambió
     DIGITAL_INPUT_WAS_ACTIVATED = 1,    //!< Indica que la entrada se desactivó
@@ -53,7 +53,6 @@ typedef struct digital_output_s* digital_output_t;
 
 //! Estructura de datos que representa una Entrada Digital GPIO
 typedef struct digital_input_s* digital_input_t;
-
 
 /* === Public variable declarations ================================================================================ */
 
@@ -92,7 +91,7 @@ void DigitalOutputToggle(digital_output_t output);
 
 /**
  * @brief Función que permite crear una Entrada Digital GPIO
- * 
+ *
  * @param gpio_port Puerto GPIO correspondiente a la entrada digital
  * @param gpio_bit Bit especiífico del puerto GPIO correspondiente a la entrada digital
  * @param inverted_logic Determina si la entrada tiene lógica inversa o no
@@ -100,10 +99,9 @@ void DigitalOutputToggle(digital_output_t output);
  */
 digital_input_t DigitalInputCreate(uint8_t gpio_port, uint8_t gpio_bit, bool inverted_logic);
 
-
 /**
  * @brief Función que permite detectar si la entrada está activada
- * 
+ *
  * @param input Puntero a la estructura que contiene los datos de la entrada
  * @return true Si la entrada está activada
  * @return false Si la entrada NO está activada
@@ -112,7 +110,7 @@ bool DigitalInputGetIsActive(digital_input_t input);
 
 /**
  * @brief Función que permite detectar si la entrada tuvo algún cambio
- * 
+ *
  * @param input Puntero a la estructura que contiene los datos de la entrada
  * @return digital_input_state_t En qué sentido se produjo el cambio o si NO hubo ningún cambio
  */
@@ -120,7 +118,7 @@ digital_input_state_t DigitalInputHasChanged(digital_input_t input);
 
 /**
  * @brief Función que permite detectar si la entrada fue activada
- * 
+ *
  * @param input Puntero a la estructura que contiene los datos de la entrada
  * @return true Si la entrada pasó de desactivada a activada
  * @return false Si la entrada NO pasó de desactivada a activada
@@ -129,13 +127,12 @@ bool DigitalInputWasActivated(digital_input_t input);
 
 /**
  * @brief Función que permite detectar si la entrada fue desactivada
- * 
+ *
  * @param input Puntero a la estructura que contiene los datos de la entrada
  * @return true Si la entrada pasó de activada a desactivada
  * @return false Si la entrada NO pasó de activada a desactivada
  */
 bool DigitalInputWasDeactivated(digital_input_t input);
-
 
 /* === End of conditional blocks =================================================================================== */
 

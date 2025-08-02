@@ -34,7 +34,7 @@
 
 /**
  * @file main.c
- * @brief Código Fuente principal del proyecto (Por ahora son solo pruebas)
+ * @brief Código Fuente principal del proyecto
  *
  */
 /* === Headers files inclusions =============================================================== */
@@ -64,7 +64,7 @@ typedef enum clock_state_e {
 /* === Private function declarations =========================================================== */
 
 /**
- * @brief Función que permite configurar el Systick
+ * @brief Función que permite configurar el Systick. Genera una interrupción cada 1ms
  *
  */
 static void SystickConfig(void);
@@ -131,16 +131,16 @@ static const struct clock_alarm_driver_s driver = {
 
 /* === Private function implementation ========================================================= */
 
+// Genera un interrupción cada 1 ms y se ejcuta el código de Systick_Handler (1 Tick = 1 ms)
 static void SystickConfig(void) {
-    // Genera un interrupción cada 1 ms y se ejcuta el código de Systick_Handler (1 Tick = 1 ms)
     SystemCoreClockUpdate();
     SysTick_Config((SystemCoreClock / 1000) - 1);
 
-    NVIC_SetPriority(SysTick_IRQn, (1 << __NVIC_PRIO_BITS) - 1);
+    // NVIC_SetPriority(SysTick_IRQn, (1 << __NVIC_PRIO_BITS) - 1);
 }
 
 static void ClockAlarmTurnOn(clock_t self) {
-    if(exit_adjusting_alarm){
+    if (exit_adjusting_alarm) {
         DigitalOutputActivate(board->led_alarm);
     }
 }
@@ -184,22 +184,20 @@ void SysTick_Handler(void) {
     }
 
     // Controla si el botón F2 se mantuvo pulsado por 3 segundos
-    if(current_state == STATE_SHOWING_CURRENT_TIME){
+    if (current_state == STATE_SHOWING_CURRENT_TIME) {
         if (DigitalInputGetIsActive(board->key_F2)) {
-        ticks_F2_was_pressed++;
+            ticks_F2_was_pressed++;
 
-        if (ticks_F2_was_pressed == 3000) {
-            enter_adjusting_alarm_mode = true;
+            if (ticks_F2_was_pressed == 3000) {
+                enter_adjusting_alarm_mode = true;
+            }
+        } else {
+            ticks_F2_was_pressed = 0;
         }
     } else {
         ticks_F2_was_pressed = 0;
-    }
-    }else{
-        ticks_F2_was_pressed = 0;
         enter_adjusting_alarm_mode = false;
     }
-    
-
 
     // Controla si el botón F3 se mantuvo presionado por mas de 50ms (para evitar rebotes)
     if (DigitalInputGetIsActive(board->key_F3)) {
@@ -250,12 +248,12 @@ void SysTick_Handler(void) {
     }
 
     // Controla si han pasado 30 segundos sin que se presione ningún botón
-    if (current_state == STATE_ADJUSTING_TIME_MINUTES || current_state == STATE_ADJUSTING_TIME_HOURS
-        || current_state == STATE_ADJUSTING_ALARM_MINUTES || current_state == STATE_ADJUSTING_ALARM_HOURS) {
+    if (current_state == STATE_ADJUSTING_TIME_MINUTES || current_state == STATE_ADJUSTING_TIME_HOURS || current_state == STATE_ADJUSTING_ALARM_MINUTES ||
+        current_state == STATE_ADJUSTING_ALARM_HOURS) {
 
         ticks_no_button_was_pressed++;
 
-        if (ticks_no_button_was_pressed == 30000) {
+        if (ticks_no_button_was_pressed == 30000) { 
             ticks_no_button_was_pressed = 0;
             no_button_was_pressed_for_30secs = true;
         }
@@ -281,10 +279,9 @@ int main(void) {
     bool valid_time;
 
     board = BoardCreate();
-    clock = ClockCreate(50, 300, &driver);
-                    
-    while (true) { // CORREGIR: PARPADEO RARO EN ALGUNOS MOMENTOS
-                   // ACORDARSE DE PONER EN FALSE ALARM_IS_ACTIVATED CUANDO SE DESACTIVE
+    clock = ClockCreate(1000, 300, &driver); 
+
+    while (true) {
 
         switch (current_state) {
 
@@ -326,22 +323,21 @@ int main(void) {
                     current_state = STATE_ADJUSTING_ALARM_MINUTES;
                 }
 
-                if(!ClockGetIfAlarmIsRinging(clock)){
-                    if(key_accept_was_pressed){
+                if (!ClockGetIfAlarmIsRinging(clock)) {
+                    if (key_accept_was_pressed) {
                         key_accept_was_pressed = false;
                         alarm_is_activated = true;
                         ClockSetAlarm(clock, &alarm_time);
                     }
 
-                    if(key_cancel_was_pressed){
+                    if (key_cancel_was_pressed) {
                         key_cancel_was_pressed = false;
                         alarm_is_activated = false;
                         ClockDisableAlarm(clock);
                     }
                 }
-                
 
-                if(ClockGetIfAlarmIsActivated(clock)){
+                if (ClockGetIfAlarmIsActivated(clock)) {
                     ScreenWriteBCD(board->screen, current_time.bcd, 4);
 
                     ScreenSetDotState(board->screen, 2, true);
@@ -349,13 +345,13 @@ int main(void) {
                     ScreenFlashDot(board->screen, 2, 125);
                 }
 
-                if(ClockGetIfAlarmIsRinging(clock)){
-                    if(key_accept_was_pressed){
+                if (ClockGetIfAlarmIsRinging(clock)) {
+                    if (key_accept_was_pressed) {
                         key_accept_was_pressed = false;
                         ClockSnoozeAlarm(clock);
                     }
 
-                    if(key_cancel_was_pressed){
+                    if (key_cancel_was_pressed) {
                         key_cancel_was_pressed = false;
                         ClockCancelAlarm(clock);
                     }
@@ -372,9 +368,9 @@ int main(void) {
                     key_cancel_was_pressed = false;
                     no_button_was_pressed_for_30secs = false;
                     enter_adjusting_mode = false;
-                    if(valid_time){
+                    if (valid_time) {
                         current_state = STATE_SHOWING_CURRENT_TIME;
-                    }else{
+                    } else {
                         current_state = STATE_INVALID_TIME;
                     }
                 } else {
@@ -415,9 +411,9 @@ int main(void) {
                     enter_adjusting_mode = false;
                     key_cancel_was_pressed = false;
                     no_button_was_pressed_for_30secs = false;
-                    if(valid_time){
+                    if (valid_time) {
                         current_state = STATE_SHOWING_CURRENT_TIME;
-                    }else{
+                    } else {
                         current_state = STATE_INVALID_TIME;
                     }
                 } else {
@@ -462,9 +458,9 @@ int main(void) {
                 ScreenSetDotState(board->screen, 3, true);
 
                 if (key_cancel_was_pressed || no_button_was_pressed_for_30secs) {
-                    if(alarm_is_activated){
+                    if (alarm_is_activated) {
                         ClockSetAlarm(clock, &alarm_time);
-                    }else{
+                    } else {
                         ClockDisableAlarm(clock);
                     }
                     enter_adjusting_alarm_mode = false;
@@ -472,7 +468,7 @@ int main(void) {
                     no_button_was_pressed_for_30secs = false;
                     current_state = STATE_SHOWING_CURRENT_TIME;
                     exit_adjusting_alarm = true;
-                }else{
+                } else {
                     if (F4_was_pressed) {
                         F4_was_pressed = false;
                         exit_adjusting_alarm = false;
@@ -503,7 +499,7 @@ int main(void) {
                 }
 
                 break;
-                
+
             case STATE_ADJUSTING_ALARM_HOURS:
                 ScreenFlashDigits(board->screen, 0, 1, 125);
 
@@ -513,9 +509,9 @@ int main(void) {
                 ScreenSetDotState(board->screen, 3, true);
 
                 if (key_cancel_was_pressed || no_button_was_pressed_for_30secs) {
-                    if(alarm_is_activated){
+                    if (alarm_is_activated) {
                         ClockSetAlarm(clock, &alarm_time);
-                    }else{
+                    } else {
                         ClockDisableAlarm(clock);
                     }
                     enter_adjusting_alarm_mode = false;

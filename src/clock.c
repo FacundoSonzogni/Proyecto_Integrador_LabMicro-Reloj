@@ -35,19 +35,19 @@ SPDX-License-Identifier: MIT
 
 /*! Estructura de datos que representa un Reloj */
 struct clock_s {
-    clock_time_t current_time;
-    bool valid_time;
-    uint16_t ticks_per_second;
-    uint16_t current_clock_tick;
-    clock_time_t setted_alarm_time;
-    bool activated_alarm;
-    bool alarm_is_ringing;
-    bool ringig_is_enabled;
-    bool snoozed_alarm;
-    uint16_t snooze_seconds;
-    uint16_t seconds_count;
-    clock_time_t snoozed_alarm_time;
-    clock_alarm_driver_t alarm_driver;
+    clock_time_t current_time;         //!< Contiene la hora, minutos y segundos actuales del reloj
+    bool valid_time;                   //!< Indica que la hora seteada es válida
+    uint16_t ticks_per_second;         //!< Indica cuantos ticks hay en un segundo
+    uint16_t current_clock_tick;       //!< Cuenta interna actual de los ticks
+    clock_time_t setted_alarm_time;    //!< Hora seteada para la alarma
+    bool activated_alarm;              //!< Indica si la alarma está activada
+    bool alarm_is_ringing;             //!< Indica si la alarma está sonando
+    bool ringig_is_enabled;            //!< Indica si está habilitado el sonido de la alarma
+    bool snoozed_alarm;                //!< Indica si la alarma fue pospuesta
+    uint16_t snooze_seconds;           //!< Representa la cantidad de segundos que se pospone la alarma
+    uint16_t seconds_count;            //!< Cuenta interma actual de los segundos
+    clock_time_t snoozed_alarm_time;   //!< Hora a la que debe sonar la alarma en caso de haber sido pospuesta
+    clock_alarm_driver_t alarm_driver; //!< Driver del reloj con las funciones de callback para gestionar la alarma
 };
 
 /* === Private function declarations =============================================================================== */
@@ -299,10 +299,8 @@ void ClockTick(clock_t self) {
                     self->alarm_is_ringing = false;
                 }
 
-                //memcpy(&(self->snoozed_alarm_time.bcd), &(self->setted_alarm_time.bcd), sizeof(clock_time_t));
-
             } else {
-                if(self->ringig_is_enabled){
+                if (self->ringig_is_enabled) {
                     if (memcmp(&(self->current_time.bcd), &(self->snoozed_alarm_time.bcd), sizeof(clock_time_t)) == 0) {
                         self->ringig_is_enabled = true;
                         self->alarm_is_ringing = true;
@@ -353,7 +351,7 @@ bool ClockSetAlarm(clock_t self, const clock_time_t* time_set) {
 
         if (result == true) {
             memcpy(&(self->setted_alarm_time.bcd), time_set, sizeof(clock_time_t));
-            //memcpy(&(self->snoozed_alarm_time.bcd), &(self->setted_alarm_time.bcd), sizeof(clock_time_t));
+
             self->activated_alarm = true;
             self->ringig_is_enabled = true;
         }

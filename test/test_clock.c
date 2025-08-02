@@ -1109,7 +1109,7 @@ void test_alarm_can_be_snoozed(void) {
     ClockSnoozeAlarm(clock);
     TEST_ASSERT_FALSE(ClockGetIfAlarmIsRinging(clock));
 
-    SimulateNSeconds(clock, CLOCK_SNOOZE_SECONDS+1);
+    SimulateNSeconds(clock, CLOCK_SNOOZE_SECONDS + 1);
     TEST_ASSERT_TRUE(ClockGetIfAlarmIsRinging(clock));
 }
 
@@ -1137,7 +1137,7 @@ void test_alarm_can_be_snoozed_twice(void) {
     ClockSnoozeAlarm(clock);
     TEST_ASSERT_FALSE(ClockGetIfAlarmIsRinging(clock));
 
-    SimulateNSeconds(clock, CLOCK_SNOOZE_SECONDS+1);
+    SimulateNSeconds(clock, CLOCK_SNOOZE_SECONDS + 1);
     TEST_ASSERT_TRUE(ClockGetIfAlarmIsRinging(clock));
 
     SimulateNSeconds(clock, 5);
@@ -1146,7 +1146,7 @@ void test_alarm_can_be_snoozed_twice(void) {
     ClockSnoozeAlarm(clock);
     TEST_ASSERT_FALSE(ClockGetIfAlarmIsRinging(clock));
 
-    SimulateNSeconds(clock, CLOCK_SNOOZE_SECONDS+1);
+    SimulateNSeconds(clock, CLOCK_SNOOZE_SECONDS + 1);
     TEST_ASSERT_TRUE(ClockGetIfAlarmIsRinging(clock));
 }
 
@@ -1208,7 +1208,7 @@ void test_alarm_rings_at_setted_time_even_if_it_was_snoozed(void) {
     ClockSnoozeAlarm(clock);
     TEST_ASSERT_FALSE(ClockGetIfAlarmIsRinging(clock));
 
-    SimulateNSeconds(clock, CLOCK_SNOOZE_SECONDS+1);
+    SimulateNSeconds(clock, CLOCK_SNOOZE_SECONDS + 1);
     TEST_ASSERT_TRUE(ClockGetIfAlarmIsRinging(clock));
 
     SimulateNSeconds(clock, 5);
