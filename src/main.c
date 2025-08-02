@@ -281,7 +281,7 @@ int main(void) {
     bool valid_time;
 
     board = BoardCreate();
-    clock = ClockCreate(1000, 300, &driver);
+    clock = ClockCreate(50, 300, &driver);
                     
     while (true) { // CORREGIR: PARPADEO RARO EN ALGUNOS MOMENTOS
                    // ACORDARSE DE PONER EN FALSE ALARM_IS_ACTIVATED CUANDO SE DESACTIVE
@@ -326,17 +326,20 @@ int main(void) {
                     current_state = STATE_ADJUSTING_ALARM_MINUTES;
                 }
 
-                if(key_accept_was_pressed){
-                    key_accept_was_pressed = false;
-                    alarm_is_activated = true;
-                    ClockSetAlarm(clock, &alarm_time);
-                }
+                if(!ClockGetIfAlarmIsRinging(clock)){
+                    if(key_accept_was_pressed){
+                        key_accept_was_pressed = false;
+                        alarm_is_activated = true;
+                        ClockSetAlarm(clock, &alarm_time);
+                    }
 
-                if(key_cancel_was_pressed){
-                    key_cancel_was_pressed = false;
-                    alarm_is_activated = false;
-                    ClockDisableAlarm(clock);
+                    if(key_cancel_was_pressed){
+                        key_cancel_was_pressed = false;
+                        alarm_is_activated = false;
+                        ClockDisableAlarm(clock);
+                    }
                 }
+                
 
                 if(ClockGetIfAlarmIsActivated(clock)){
                     ScreenWriteBCD(board->screen, current_time.bcd, 4);
@@ -344,6 +347,18 @@ int main(void) {
                     ScreenSetDotState(board->screen, 2, true);
                     ScreenSetDotState(board->screen, 0, true);
                     ScreenFlashDot(board->screen, 2, 125);
+                }
+
+                if(ClockGetIfAlarmIsRinging(clock)){
+                    if(key_accept_was_pressed){
+                        key_accept_was_pressed = false;
+                        ClockSnoozeAlarm(clock);
+                    }
+
+                    if(key_cancel_was_pressed){
+                        key_cancel_was_pressed = false;
+                        ClockCancelAlarm(clock);
+                    }
                 }
 
                 break;

@@ -299,14 +299,16 @@ void ClockTick(clock_t self) {
                     self->alarm_is_ringing = false;
                 }
 
-                memcpy(&(self->snoozed_alarm_time.bcd), &(self->setted_alarm_time.bcd), sizeof(clock_time_t));
+                //memcpy(&(self->snoozed_alarm_time.bcd), &(self->setted_alarm_time.bcd), sizeof(clock_time_t));
 
             } else {
-                if (memcmp(&(self->current_time.bcd), &(self->snoozed_alarm_time.bcd), sizeof(clock_time_t))) {
-                    self->ringig_is_enabled = true;
-                    self->alarm_is_ringing = true;
-                    self->snoozed_alarm = false;
-                    self->alarm_driver->ClockAlarmTurnOn(self);
+                if(self->ringig_is_enabled){
+                    if (memcmp(&(self->current_time.bcd), &(self->snoozed_alarm_time.bcd), sizeof(clock_time_t)) == 0) {
+                        self->ringig_is_enabled = true;
+                        self->alarm_is_ringing = true;
+                        self->snoozed_alarm = false;
+                        self->alarm_driver->ClockAlarmTurnOn(self);
+                    }
                 }
             }
 
@@ -351,7 +353,7 @@ bool ClockSetAlarm(clock_t self, const clock_time_t* time_set) {
 
         if (result == true) {
             memcpy(&(self->setted_alarm_time.bcd), time_set, sizeof(clock_time_t));
-            memcpy(&(self->snoozed_alarm_time.bcd), &(self->setted_alarm_time.bcd), sizeof(clock_time_t));
+            //memcpy(&(self->snoozed_alarm_time.bcd), &(self->setted_alarm_time.bcd), sizeof(clock_time_t));
             self->activated_alarm = true;
             self->ringig_is_enabled = true;
         }
@@ -445,12 +447,14 @@ void ClockDisableRingig(clock_t self) {
 }
 
 void ClockSnoozeAlarm(clock_t self) {
+    clock_time_t aux = self->current_time;
     for (uint16_t i = 0; i < self->snooze_seconds; i++) {
-        ClockTickIncrement(&(self->snoozed_alarm_time));
+        ClockTickIncrement(&aux);
     }
 
+    self->snoozed_alarm_time = aux;
+
     self->snoozed_alarm = true;
-    self->ringig_is_enabled = false;
     self->alarm_is_ringing = false;
     self->alarm_driver->ClockAlarmTurnOff(self);
 }
@@ -459,7 +463,6 @@ void ClockCancelAlarm(clock_t self) {
     memcpy(&(self->snoozed_alarm_time.bcd), &(self->setted_alarm_time.bcd), sizeof(clock_time_t));
 
     self->snoozed_alarm = true;
-    self->ringig_is_enabled = false;
     self->alarm_is_ringing = false;
     self->alarm_driver->ClockAlarmTurnOff(self);
 }
