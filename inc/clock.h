@@ -55,12 +55,12 @@ typedef union {
 typedef struct clock_s* clock_t;
 
 //! Tipo de dato que representa una función que permite encender la alarma
-typedef void (*clock_alarm_turn_on)(clock_t);
+typedef void (*clock_alarm_turn_on)(void);
 
 //! Tipo de dato que representa una función que permite apagar la alarma
-typedef void (*clock_alarm_turn_of)(clock_t);
+typedef void (*clock_alarm_turn_of)(void);
 
-//! Estructura de datos que representa el driver del reloj con las funciones de callback para gestionar la alarma 
+//! Estructura de datos que representa el driver del reloj con las funciones de callback para gestionar la alarma
 typedef struct clock_alarm_driver_s {
     clock_alarm_turn_on ClockAlarmTurnOn;  //!< Función que permite encender el sonido de la alarma
     clock_alarm_turn_of ClockAlarmTurnOff; //!< Función que permite apagar el sonido de la alarma

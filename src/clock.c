@@ -305,7 +305,7 @@ void ClockTick(clock_t self) {
                         self->ringig_is_enabled = true;
                         self->alarm_is_ringing = true;
                         self->snoozed_alarm = false;
-                        self->alarm_driver->ClockAlarmTurnOn(self);
+                        self->alarm_driver->ClockAlarmTurnOn();
                     }
                 }
             }
@@ -418,7 +418,7 @@ bool ClockRingAlarm(clock_t self) {
     if (self != NULL) {
         if (ClockGetIfAlarmIsActivated(self)) {
             self->alarm_is_ringing = true;
-            self->alarm_driver->ClockAlarmTurnOn(self);
+            self->alarm_driver->ClockAlarmTurnOn();
             result = true;
         }
     }
@@ -454,7 +454,7 @@ void ClockSnoozeAlarm(clock_t self) {
 
     self->snoozed_alarm = true;
     self->alarm_is_ringing = false;
-    self->alarm_driver->ClockAlarmTurnOff(self);
+    self->alarm_driver->ClockAlarmTurnOff();
 }
 
 void ClockCancelAlarm(clock_t self) {
@@ -462,6 +462,6 @@ void ClockCancelAlarm(clock_t self) {
 
     self->snoozed_alarm = true;
     self->alarm_is_ringing = false;
-    self->alarm_driver->ClockAlarmTurnOff(self);
+    self->alarm_driver->ClockAlarmTurnOff();
 }
 /* === End of documentation ======================================================================================== */
