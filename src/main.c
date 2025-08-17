@@ -25,6 +25,8 @@ SPDX-License-Identifier: MIT
  */
 /* === Headers files inclusions =============================================================== */
 
+#include "FreeRTOS.h"
+#include "task.h"
 #include "bsp.h"
 #include "chip.h"
 #include "clock.h"
@@ -51,12 +53,6 @@ typedef enum clock_state_e {
 /* === Private function declarations =========================================================== */
 
 /**
- * @brief Función que permite configurar el Systick. Genera una interrupción cada 1ms
- *
- */
-static void SystickConfig(void);
-
-/**
  * @brief Función que permite simular el encendido del sonido de la alarma
  *
  * @param clock Puntero a la estructura con los datos del reloj
@@ -77,6 +73,20 @@ static void ClockAlarmTurnOff(void);
  * @return false Si se presionó algún botón antes de que pasen 30 segundos
  */
 static bool NoButtonPressedFor30secs(void);
+
+/**
+ * @brief Tarea que permite hacer el refersco del reloj y pantalla (Reemplaza al Systick)
+ * 
+ * @param arguments Argumentos de la tarea
+ */
+static void RefreshTask(void* arguments);
+
+/**
+ * @brief Tarea que realiza la MEF de la aplicación deseada
+ * 
+ * @param arguments Argumentos de la tarea
+ */
+static void MEFTask(void* arguments);
 
 /* === Public variable definitions ============================================================= */
 
@@ -111,14 +121,6 @@ static const struct clock_alarm_driver_s driver = {
 
 /* === Private function implementation ========================================================= */
 
-// Genera un interrupción cada 1 ms y se ejcuta el código de Systick_Handler (1 Tick = 1 ms)
-static void SystickConfig(void) {
-    SystemCoreClockUpdate();
-    SysTick_Config((SystemCoreClock / 1000) - 1);
-
-    // NVIC_SetPriority(SysTick_IRQn, (1 << __NVIC_PRIO_BITS) - 1);
-}
-
 static void ClockAlarmTurnOn(void) {
     if (exit_adjusting_alarm) {
         DigitalOutputActivate(board->led_alarm);
@@ -139,24 +141,28 @@ static bool NoButtonPressedFor30secs(void) {
     return result;
 }
 
-/* === Public function implementation ========================================================== */
+static void RefreshTask(void* arguments) {
+    (void)arguments;
+    TickType_t last_value = xTaskGetTickCount();
 
-//! Función que se ejecuta cada 1 ms (Rutina de servicio de interrupción del Systick)
-void SysTick_Handler(void) {
-    milis++;
+    while (true) {
+        milis++;
 
-    if (board != NULL) {
-        ScreenRefresh(board->screen);
-    }
+        if (board != NULL) {
+            ScreenRefresh(board->screen);
+        }
 
-    if (clock != NULL) {
-        ClockTick(clock);
+        if (clock != NULL) {
+            ClockTick(clock);
+        }
+
+        xTaskDelayUntil(&last_value, pdMS_TO_TICKS(1));
     }
 }
 
-//! Programa principal con la aplicación deseada
-int main(void) {
-    SystickConfig();
+
+static void MEFTask(void* arguments) {
+    (void)arguments;
 
     uint64_t aux_milis = 0;
 
@@ -169,7 +175,7 @@ int main(void) {
 
     bool valid_time;
 
-    board = BoardCreate();
+    // board = BoardCreate();
     clock = ClockCreate(1000, 300, &driver);
 
     button_t key_set_time = ButtonCreate(board->key_F1);
@@ -451,6 +457,22 @@ int main(void) {
                     break;
             }
         }
+    }
+}
+
+/* === Public function implementation ========================================================== */
+
+
+//! Programa principal con la aplicación deseada
+int main(void) {
+
+    board = BoardCreate();
+
+    xTaskCreate(RefreshTask, "Refresco", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
+    xTaskCreate(MEFTask, "MEF", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    vTaskStartScheduler();
+
+    while (1) {
     }
 }
 

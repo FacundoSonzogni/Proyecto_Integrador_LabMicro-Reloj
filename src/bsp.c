@@ -30,6 +30,7 @@ SPDX-License-Identifier: MIT
 #include "edu-ciaa-nxp.h"
 #include "shield.h"
 #include "screen.h"
+#include "board.h"
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -169,6 +170,9 @@ board_t BoardCreate() {
     struct board_s* self = malloc(sizeof(struct board_s));
 
     if (self != NULL) {
+
+        BoardSetup();
+        BoardSetup();
 
         Chip_SCU_PinMuxSet(LED_RGB_BLUE_PORT, LED_RGB_BLUE_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_RGB_BLUE_FUNC);
         Chip_GPIO_SetPinState(LPC_GPIO_PORT, LED_RGB_BLUE_GPIO, LED_RGB_BLUE_BIT, true);
