@@ -24,6 +24,8 @@ SPDX-License-Identifier: MIT
 
 /* === Headers files inclusions ==================================================================================== */
 
+#include "FreeRTOS.h"
+#include "task.h"
 #include "screen.h"
 #include "bsp.h"
 #include <stdlib.h>
@@ -224,6 +226,20 @@ int ScreenFlashDot(screen_t self, uint8_t digit, uint16_t half_period) {
     }
 
     return result;
+}
+
+void ScreenRefreshTask(void *screen){
+    
+    TickType_t last_value = xTaskGetTickCount();
+
+    while (true) {
+
+        if (screen != NULL) {
+            ScreenRefresh(screen);
+        }
+
+        xTaskDelayUntil(&last_value, pdMS_TO_TICKS(1));
+    }
 }
 
 /* === End of documentation ======================================================================================== */

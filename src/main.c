@@ -74,12 +74,12 @@ static void ClockAlarmTurnOff(void);
  */
 static bool NoButtonPressedFor30secs(void);
 
-/**
- * @brief Tarea que permite hacer el refersco del reloj y pantalla (Reemplaza al Systick)
- * 
- * @param arguments Argumentos de la tarea
- */
-static void RefreshTask(void* arguments);
+// /**
+//  * @brief Tarea que permite hacer el refersco del reloj y pantalla (Reemplaza al Systick)
+//  * 
+//  * @param arguments Argumentos de la tarea
+//  */
+// static void RefreshTask(void* arguments);
 
 /**
  * @brief Tarea que realiza la MEF de la aplicación deseada
@@ -117,6 +117,7 @@ static const struct clock_alarm_driver_s driver = {
     .ClockAlarmTurnOff = ClockAlarmTurnOff,
 };
 
+
 /* === Private variable definitions ============================================================ */
 
 /* === Private function implementation ========================================================= */
@@ -141,16 +142,12 @@ static bool NoButtonPressedFor30secs(void) {
     return result;
 }
 
-static void RefreshTask(void* arguments) {
+static void ClockTickTask(void* arguments) {
     (void)arguments;
     TickType_t last_value = xTaskGetTickCount();
 
     while (true) {
         milis++;
-
-        if (board != NULL) {
-            ScreenRefresh(board->screen);
-        }
 
         if (clock != NULL) {
             ClockTick(clock);
@@ -468,7 +465,8 @@ int main(void) {
 
     board = BoardCreate();
 
-    xTaskCreate(RefreshTask, "Refresco", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
+    xTaskCreate(ClockTickTask, "ClockTick", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, NULL);
+    xTaskCreate(ScreenRefreshTask, "ScreenRefresh", configMINIMAL_STACK_SIZE, board->screen, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(MEFTask, "MEF", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     vTaskStartScheduler();
 
