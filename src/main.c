@@ -74,13 +74,6 @@ static void ClockAlarmTurnOff(void);
  */
 static bool NoButtonPressedFor30secs(void);
 
-// /**
-//  * @brief Tarea que permite hacer el refersco del reloj y pantalla (Reemplaza al Systick)
-//  * 
-//  * @param arguments Argumentos de la tarea
-//  */
-// static void RefreshTask(void* arguments);
-
 /**
  * @brief Tarea que realiza la MEF de la aplicación deseada
  * 
@@ -98,9 +91,6 @@ static clock_t clock = NULL;
 
 //! Variable global que representa el estado actual del reloj despertador
 static clock_state_t current_state = STATE_SHOWING_CURRENT_TIME;
-
-//! Variable global que cuenta los milisegundos transcurridos desde que se inicia el programa
-static volatile uint64_t milis = 0;
 
 //! Variable global que cuenta la cantidad de milisegundos que pasaron sin que se pulse ningún botón
 static volatile int ticks_no_button_was_pressed = 0;
@@ -142,26 +132,11 @@ static bool NoButtonPressedFor30secs(void) {
     return result;
 }
 
-static void ClockTickTask(void* arguments) {
-    (void)arguments;
-    TickType_t last_value = xTaskGetTickCount();
-
-    while (true) {
-        milis++;
-
-        if (clock != NULL) {
-            ClockTick(clock);
-        }
-
-        xTaskDelayUntil(&last_value, pdMS_TO_TICKS(1));
-    }
-}
-
-
 static void MEFTask(void* arguments) {
     (void)arguments;
 
-    uint64_t aux_milis = 0;
+    TickType_t aux_milis = 0;
+    TickType_t milis;
 
     clock_time_t current_time;
     clock_time_t adjusted_time;
@@ -172,9 +147,6 @@ static void MEFTask(void* arguments) {
 
     bool valid_time;
 
-    // board = BoardCreate();
-    clock = ClockCreate(1000, 300, &driver);
-
     button_t key_set_time = ButtonCreate(board->key_F1);
     button_t key_set_alarm = ButtonCreate(board->key_F2);
     button_t key_increment = ButtonCreate(board->key_F4);
@@ -183,6 +155,8 @@ static void MEFTask(void* arguments) {
     button_t key_accept = ButtonCreate(board->key_accept);
 
     while (true) {
+
+        milis = xTaskGetTickCount();
 
         if (milis - aux_milis == 1) {
             aux_milis = milis;
@@ -464,8 +438,9 @@ static void MEFTask(void* arguments) {
 int main(void) {
 
     board = BoardCreate();
+    clock = ClockCreate(1000, 300, &driver);
 
-    xTaskCreate(ClockTickTask, "ClockTick", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, NULL);
+    xTaskCreate(ClockTickTask, "ClockTick", configMINIMAL_STACK_SIZE, clock, tskIDLE_PRIORITY + 3, NULL);
     xTaskCreate(ScreenRefreshTask, "ScreenRefresh", configMINIMAL_STACK_SIZE, board->screen, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(MEFTask, "MEF", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     vTaskStartScheduler();

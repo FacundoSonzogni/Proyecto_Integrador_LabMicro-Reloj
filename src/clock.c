@@ -24,6 +24,8 @@ SPDX-License-Identifier: MIT
 
 /* === Headers files inclusions ==================================================================================== */
 
+#include "FreeRTOS.h"
+#include "task.h"
 #include "clock.h"
 #include <stddef.h>
 #include <string.h>
@@ -463,5 +465,18 @@ void ClockCancelAlarm(clock_t self) {
     self->snoozed_alarm = true;
     self->alarm_is_ringing = false;
     self->alarm_driver->ClockAlarmTurnOff();
+}
+
+void ClockTickTask(void* clock) {
+    TickType_t last_value = xTaskGetTickCount();
+
+    while (true) {
+
+        if (clock != NULL) {
+            ClockTick((clock_t)clock);
+        }
+
+        xTaskDelayUntil(&last_value, pdMS_TO_TICKS(1));
+    }
 }
 /* === End of documentation ======================================================================================== */

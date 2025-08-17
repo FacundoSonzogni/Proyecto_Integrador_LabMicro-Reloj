@@ -235,7 +235,7 @@ void ScreenRefreshTask(void *screen){
     while (true) {
 
         if (screen != NULL) {
-            ScreenRefresh(screen);
+            ScreenRefresh((screen_t)screen);
         }
 
         xTaskDelayUntil(&last_value, pdMS_TO_TICKS(1));

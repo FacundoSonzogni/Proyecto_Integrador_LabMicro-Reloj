@@ -245,6 +245,13 @@ void ClockSnoozeAlarm(clock_t clock);
  */
 void ClockCancelAlarm(clock_t clock);
 
+/**
+ * @brief Tarea para implementar el tick del reloj utilizando FreeRTOS
+ * 
+ * @param clock Puntero con los datos de la pantalla
+ */
+void ClockTickTask(void* clock);
+
 /* === End of conditional blocks =================================================================================== */
 
 #ifdef __cplusplus
