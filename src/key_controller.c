@@ -29,6 +29,10 @@ SPDX-License-Identifier: MIT
 
 /* === Macros definitions ========================================================================================== */
 
+#ifndef KEY_TASK_DELAY_MS
+#define KEY_TASK_DELAY_MS 100
+#endif
+
 /* === Private data type declarations ============================================================================== */
 
 /*! Estructura de datos que representa un botón de la placa */
@@ -76,6 +80,45 @@ bool ButtonWasPressed3secs(button_t self) {
 
 bool ButtonWasPressed(button_t self) {
     return DigitalInputWasActivated(self->key);
+}
+
+void ButtonPressedTask(void* pointer) {
+    button_task_args_t args = pointer;
+
+    while (true) {
+        while (DigitalInputGetIsActive(((digital_input_t)args->key)) == false) {
+            vTaskDelay(pdMS_TO_TICKS(KEY_TASK_DELAY_MS));
+        }
+
+        xEventGroupSetBits(args->event_group, (EventBits_t)args->event_mask);
+
+        while (DigitalInputGetIsActive(((digital_input_t)args->key)) == true) {
+            vTaskDelay(pdMS_TO_TICKS(KEY_TASK_DELAY_MS));
+        }
+    }
+}
+
+void ButtonPressed3secsTask(void* pointer) {
+    button_task_args_t args = pointer;
+    TickType_t initial_ticks;
+    TickType_t current_tick;
+
+    while (true) {
+        while (DigitalInputGetIsActive(((digital_input_t)args->key)) == false) {
+            vTaskDelay(pdMS_TO_TICKS(KEY_TASK_DELAY_MS));
+        }
+
+        initial_ticks = xTaskGetTickCount();
+
+        while (DigitalInputGetIsActive(((digital_input_t)args->key)) == true) {
+            current_tick = xTaskGetTickCount();
+            vTaskDelay(pdMS_TO_TICKS(10));
+
+            if (current_tick - initial_ticks >= pdMS_TO_TICKS(3000)) {
+                xEventGroupSetBits(args->event_group, (EventBits_t)args->event_mask);
+            }
+        }
+    }
 }
 
 /* === End of documentation ======================================================================================== */

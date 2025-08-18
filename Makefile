@@ -14,4 +14,3 @@ doc: | $(DOC_DIR)
 
 $(DOC_DIR):
 	@mkdir -p $(DOC_DIR)
-

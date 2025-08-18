@@ -27,6 +27,9 @@ SPDX-License-Identifier: MIT
 
 /* === Headers files inclusions ==================================================================================== */
 
+#include "FreeRTOS.h"
+#include "task.h"
+#include "event_groups.h"
 #include "digitals.h"
 #include <stdbool.h>
 
@@ -38,10 +41,30 @@ extern "C" {
 
 /* === Public macros definitions =================================================================================== */
 
+#define KEY_EVENT_KEY_0     (1 << 0) //!< Máscara que representa un bit en alto en la posición 0 del grupo de eventos
+#define KEY_EVENT_KEY_1     (1 << 1) //!< Máscara que representa un bit en alto en la posición 1 del grupo de eventos
+#define KEY_EVENT_KEY_2     (1 << 2) //!< Máscara que representa un bit en alto en la posición 2 del grupo de eventos
+#define KEY_EVENT_KEY_3     (1 << 3) //!< Máscara que representa un bit en alto en la posición 3 del grupo de eventos
+#define KEY_EVENT_KEY_4     (1 << 4) //!< Máscara que representa un bit en alto en la posición 4 del grupo de eventos
+#define KEY_EVENT_KEY_5     (1 << 5) //!< Máscara que representa un bit en alto en la posición 5 del grupo de eventos
+#define KEY_EVENT_KEY_6     (1 << 6) //!< Máscara que representa un bit en alto en la posición 6 del grupo de eventos
+#define KEY_EVENT_KEY_7     (1 << 7) //!< Máscara que representa un bit en alto en la posición 7 del grupo de eventos
+
+#define KEY_EVENT_ANY_KEY   0xFF //!< Máscara que representa un bit en alto en la posiciones 0 a 7 del grupo de eventos
+
+#define KEY_TASK_STACK_SIZE (2 * configMINIMAL_STACK_SIZE) //!< Cantidad de memoria necesaria en la pila para las tareas de las teclas
+
 /* === Public data type declarations =============================================================================== */
 
 //! Estructura de datos que representa un botón de la placa
 typedef struct button_s* button_t;
+
+//! Estructura de datos que representa los argumentos para las tareas al usar FreeRTOS
+typedef struct button_task_args_s{
+    EventGroupHandle_t event_group;  //!< Grupo de 32 bits que representan los posibles eventos
+    uint8_t event_mask;              //!< Máscara para representar un bit en particular del grupo de eventos
+    digital_input_t key;             //!< Tecla correspondiente a una entrada digital de la placa
+}* button_task_args_t;
 
 /* === Public variable declarations ================================================================================ */
 
@@ -72,6 +95,20 @@ bool ButtonWasPressed3secs(button_t button);
  * @return false Si el botón no fue pulsado
  */
 bool ButtonWasPressed(button_t button);
+
+/**
+ * @brief Tarea que genera un evento cuando se pulsa una tecla (con antirrebote) al usar FreeRTOS
+ * 
+ * @param arguments Argumentos necesarios para la tarea.
+ */
+void ButtonPressedTask(void *arguments);
+
+/**
+ * @brief Tarea que genera un evento cuando se pulsa una tecla 3 segundos, al usar FreeRTOS
+ * 
+ * @param arguments Argumentos necesarios para la tarea.
+ */
+void ButtonPressed3secsTask(void *arguments);
 
 /* === End of conditional blocks =================================================================================== */
 

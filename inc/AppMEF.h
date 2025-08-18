@@ -42,9 +42,16 @@ extern "C" {
 /* === Public data type declarations =============================================================================== */
 
 //! Estructura con los datos que deben pasarse como argumento de la tarea MEFTask()
-typedef struct mef_task_args_s{
-    const struct board_s* board;   //!< Puntero a la estructura con los datos de la placa
-    clock_t clock;                 //!< Puntero a la estructura con los datos del reloj
+typedef struct mef_task_args_s {
+    const struct board_s* board;    //!< Puntero a la estructura con los datos de la placa
+    clock_t clock;                  //!< Puntero a la estructura con los datos del reloj
+    uint8_t set_time_mask;          //!< Máscara que representa al evento producido al mantener pulsado el botón "set_time"
+    uint8_t increment_mask;         //!< Máscara que representa al evento producido al pulsar el botón "increment"
+    uint8_t decrement_mask;         //!< Máscara que representa al evento producido al pulsar el botón "decrement"
+    uint8_t accept_mask;            //!< Máscara que representa al evento producido al pulsar el botón "accept"
+    uint8_t cancel_mask;            //!< Máscara que representa al evento producido al pulsar el botón "cancel"
+    uint8_t set_alarm_mask;         //!< Máscara que representa al evento producido al mantener pulsado el botón "set_alarm"
+    EventGroupHandle_t event_group; //!< Grupo de 32 bits que representan los posibles eventos producidos por los botones
 }* mef_task_args_t;
 
 /* === Public variable declarations ================================================================================ */
@@ -53,10 +60,10 @@ typedef struct mef_task_args_s{
 
 /**
  * @brief Tarea que realiza el cambio de estados de la MEF al usar FreeRTOS
- * 
+ *
  * @param arguments Argumentos que deben pasarse a la tarea.
  */
-void MEFTask(void *arguments);
+void MEFTask(void* arguments);
 
 /* === End of conditional blocks =================================================================================== */
 

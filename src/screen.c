@@ -228,8 +228,8 @@ int ScreenFlashDot(screen_t self, uint8_t digit, uint16_t half_period) {
     return result;
 }
 
-void ScreenRefreshTask(void *screen){
-    
+void ScreenRefreshTask(void* screen) {
+
     TickType_t last_value = xTaskGetTickCount();
 
     while (true) {

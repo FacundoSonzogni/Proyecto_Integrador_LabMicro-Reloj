@@ -142,10 +142,10 @@ int ScreenFlashDot(screen_t screen, uint8_t digit, uint16_t half_period);
 
 /**
  * @brief Tarea para implementar el refresco de pantalla utilizando FreeRTOS
- * 
+ *
  * @param screen Puntero con los datos de la pantalla
  */
-void ScreenRefreshTask(void *screen);
+void ScreenRefreshTask(void* screen);
 
 /* === End of conditional blocks =================================================================================== */
 
